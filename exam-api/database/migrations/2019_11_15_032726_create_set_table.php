@@ -15,7 +15,9 @@ class CreateSetTable extends Migration
     {
         Schema::create('set', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->timestamps();
+            $table->string('name');
+            $table->string('password');
+            $table->unsignedInteger('time');
         });
     }
 

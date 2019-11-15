@@ -27,7 +27,7 @@ export default{
 
     actions: {
         async logIn({dispatch}, credentials){
-            let response = await axios.post('auth/signin', credentials)
+            let response = await axios.post('api/auth/signin', credentials)
 
             return dispatch('attempt', response.data.token);
         },
@@ -41,7 +41,7 @@ export default{
             }
 
             try{
-                let response = await axios.get('auth/test')
+                let response = await axios.get('api/auth/test')
                 
                 commit('SET_USER', response.data);
             }catch(e){
@@ -50,7 +50,7 @@ export default{
             }
         },
         signOut({commit}){
-            return axios.post('auth/signout').then(() => {
+            return axios.post('api/auth/signout').then(() => {
                 commit('SET_TOKEN', null);
                 commit('SET_USER', null);
             })
