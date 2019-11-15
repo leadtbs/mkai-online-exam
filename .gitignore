@@ -1,0 +1,14 @@
+exam/node_modules
+exam/dist
+exam-api/node_modules
+exam-api/public/hot
+exam-api/public/storage
+exam-api/storage/*.key
+exam-api/vendor
+exam-api/.env
+exam-api/.env.backup
+exam-api/.phpunit.result.cache
+exam-api/Homestead.json
+exam-api/Homestead.yaml
+exam-api/npm-debug.log
+exam-api/yarn-error.log
