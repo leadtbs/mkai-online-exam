@@ -16,7 +16,7 @@
     "bootstrap-vue": "^2.1.0",
     "core-js": "^3.3.2",
     "roboto-fontface": "^0.10.0",
-    "sweetalert2": "^9.3.6",
+    "sweetalert2": "^9.3.11",
     "vform": "^1.0.1",
     "vue": "^2.6.10",
     "vue-bootstrap-datetimepicker": "^5.0.1",

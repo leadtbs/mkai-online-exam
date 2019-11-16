@@ -32,16 +32,15 @@ const routes = [
         component: Admin,
         children: [
             {
-                path: '/set',
+                path: 'set',
                 name: 'set',
                 component: Sets,
-                children: [
-                    {
-                        path: ':set_id/questions',
-                        name: 'question',
-                        component: Questions
-                    }
-                ]
+            },
+            {
+                path: 'set/:set_id/questions',
+                name: 'question',
+                component: Questions,
+                props: true
             }
         ],
         beforeEnter: (to, from, next) => {

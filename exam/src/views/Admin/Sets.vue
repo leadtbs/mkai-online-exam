@@ -2,14 +2,14 @@
     <div>
         <div class="card-header font-weight-bold">
             Quiz Set List
-            <b-button @click="clearForm" variant="success" size="sm" class="float-right" v-b-modal.add-set-modal>Add Set <font-awesome-icon class="fa-fw" icon="plus-square" /></b-button>
+            <b-button @click="clearForm(); editState=false; $refs['add-set-modal'].show();" variant="success" size="sm" class="float-right">Add Set <font-awesome-icon class="fa-fw" icon="plus-square" /></b-button>
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-md-3 mt-2 p-0" v-for="set in setList" :key="set.id">
                     <table class="text-center table-bordered m-auto" style="width: 95%;">
                         <tr>
-                            <td style="height: 50px;" colspan="5" class="align-middle font-weight-bold set-pick">{{ set.name }}</td>
+                            <td @click="goToQuestions(set.id)" style="height: 50px;" colspan="5" class="align-middle font-weight-bold set-pick">{{ set.name }}</td>
                         </tr>
                         <tr>
                             <td class="align-middle" style="width:20%"><font-awesome-icon class="fa-fw text-info" icon="clock" />{{ set.time }}</td>
@@ -19,7 +19,7 @@
                                 <b-button variant="primary" size="xs" @click="editSetForm(set)"><font-awesome-icon icon="edit" /></b-button>
                             </td>
                             <td class="align-middle" style="width:10%">
-                                <b-button variant="danger" size="xs"><font-awesome-icon icon="trash" /></b-button>
+                                <b-button variant="danger" size="xs" @click="deleteSetForm(set.id)"><font-awesome-icon icon="trash" /></b-button>
                             </td>
                         </tr>
                     </table>
@@ -92,6 +92,7 @@ export default {
     name: 'sets',
     data(){
         return {
+            editState: false,
             setList: {},
             options: {
                 format: 'H:mm',
@@ -105,10 +106,12 @@ export default {
                 time: '',
                 password: ''
             }),
-            editState: false,
         }
     },
     methods: {
+        goToQuestions(id){
+            this.$router.push({ name: 'question', params: { set_id: id }})
+        },
         editSetForm(set){
             this.clearForm();
             this.editState = true;
@@ -124,13 +127,59 @@ export default {
                 this.$axios.post('api/save_set', this.form)
                 .then(() => {
                     this.$refs['add-set-modal'].hide();
-                    this.$Progress.finish();
                     this.loadSets();
+                    this.$Progress.finish();
+                    this.$Toast.fire({
+                        icon: 'success',
+                        title: 'Data added successfully'
+                    });
                 })
                 .catch(() => {
                     this.$Progress.fail();
                 })
             }
+            else{
+                this.form.put('api/save_set/'+this.form.id)
+                .then(() => {
+                    this.$refs['add-set-modal'].hide();
+                    this.loadSets();
+                    this.$Progress.finish();
+                    this.$Toast.fire({
+                        icon: 'success',
+                        title: 'Data added successfully'
+                    });
+                })
+                .catch(() => {
+                    this.$Progress.fail();
+                })
+            }
+        },
+        deleteSetForm(set_id){
+            this.$Swal.fire({
+                title: 'Are you sure?',
+                text: '',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if(result.value){
+                    this.$Progress.start();
+                    this.$axios.delete('api/save_set/'+set_id)
+                    .then(() => {
+                        this.loadSets();
+                        this.$Progress.finish();
+                        this.$Toast.fire({
+                            icon: 'success',
+                            title: 'Data deleted successfully'
+                        });
+                    })
+                    .catch(() => {
+                        this.$Swal.fire('Failed!', 'There was something wrong', 'warning');
+                    })
+                }
+            })
         },
         loadSets(){
             this.$Progress.start();
@@ -161,3 +210,12 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+
+.set-pick:hover{
+    outline: 1px solid #475C7A !important;
+    cursor: pointer;
+}
+
+</style>
