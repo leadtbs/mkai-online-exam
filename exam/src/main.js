@@ -2,8 +2,9 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import axios from 'axios'
+import axios from 'axios';
 
+import './urls.js'
 import './assets/app.scss'
 import BootstrapVue from 'bootstrap-vue'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -21,6 +22,7 @@ const Toast = Swal.mixin({
   timer: 3000
 })
 
+Vue.prototype.$axios = axios
 Vue.prototype.$Swal = Swal;
 Vue.prototype.$Toast = Toast;
 
@@ -33,23 +35,11 @@ Vue.use(VueProgressBar, {
 library.add(fas)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
-Vue.prototype.$axios = axios
-
-
-
-
-
-
-
-
-
-
 
 
 
 require('@/store/subscriber')
 
-axios.defaults.baseURL = 'http://127.0.0.1:8000'
 
 Vue.use(BootstrapVue);
 

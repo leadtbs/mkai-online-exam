@@ -1,5 +1,6 @@
 exam/node_modules
 exam/dist
+exam/src/urls.js
 exam-api/node_modules
 exam-api/public/hot
 exam-api/public/storage

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Set;
@@ -10,6 +11,16 @@ class QuizController extends Controller
 {
     public function __construct(){
         $this->middleware(['auth:api']);
+    }
+
+    public function getImage(){
+        $file = Storage::url('mila.png');
+        return response($file, 200);
+    }
+
+    public function saveImage(Request $request){
+        $fileName = date().'.'.$request->imageName->getClientOriginalExtension();
+        $request->imageName->move(public_path('storage/question'), $fileName);
     }
 
     public function setName($id){

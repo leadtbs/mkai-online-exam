@@ -25,6 +25,7 @@
                     </table>
                 </div>
             </div>
+            <img :src="$URL+'/image/1574065744.png'" alt="">
         </div>
             
         <b-modal centered
@@ -93,6 +94,7 @@ export default {
     data(){
         return {
             editState: false,
+            src: '',
             setList: {},
             options: {
                 format: 'H:mm',
@@ -207,6 +209,11 @@ export default {
     },
     created() {
         this.loadSets();
+        this.$axios.get('api/get_image')
+        .then(({data}) => {
+            //this.src = '/storage/mila.png';
+            console.log(data);
+        })
     }
 }
 </script>
