@@ -25,7 +25,7 @@
                     </table>
                 </div>
             </div>
-            <img :src="$URL+'/image/1574065744.png'" alt="">
+            
         </div>
             
         <b-modal centered

@@ -11,6 +11,7 @@ import Login from '../views/Admin/Login.vue'
 import Admin from '../views/Admin/Admin.vue'
 import Sets from '../views/Admin/Sets.vue'
 import Questions from '../views/Admin/Questions.vue'
+import AddEditQuestions from '../views/Admin/AddEditQuestions.vue'
 // ADMIN SIDE -- END
 
 Vue.use(VueRouter)
@@ -40,6 +41,12 @@ const routes = [
                 path: 'set/:set_id/questions',
                 name: 'question',
                 component: Questions,
+                props: true
+            },
+            {
+                path: 'set/:set_id/add-edit-question/:tab_index',
+                name: 'add_edit_question',
+                component: AddEditQuestions,
                 props: true
             }
         ],

@@ -13,7 +13,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import '@fortawesome/fontawesome-free/css/all.css'
 import '@fortawesome/fontawesome-free/js/all.js'
 import VueProgressBar from 'vue-progressbar'
-import Swal from 'sweetalert2';
+import Swal from 'sweetalert2'
+import PrettyCheckBox from 'pretty-checkbox-vue'
 
 const Toast = Swal.mixin({
   toast: true,
@@ -23,9 +24,10 @@ const Toast = Swal.mixin({
 })
 
 Vue.prototype.$axios = axios
-Vue.prototype.$Swal = Swal;
-Vue.prototype.$Toast = Toast;
+Vue.prototype.$Swal = Swal
+Vue.prototype.$Toast = Toast
 
+Vue.use(PrettyCheckBox)
 Vue.use(VueProgressBar, {
     color: '#9BD7D1',
     failedColor: 'red',

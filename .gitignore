@@ -3,7 +3,8 @@ exam/dist
 exam/src/urls.js
 exam-api/node_modules
 exam-api/public/hot
-exam-api/public/storage
+exam-api/public/img
+exam-api/public/audio
 exam-api/storage/*.key
 exam-api/vendor
 exam-api/.env
