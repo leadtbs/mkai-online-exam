@@ -124,15 +124,29 @@ class QuizController extends Controller
 
                     $choice->choices = $c['choice'];
                     $choice->correct = ($y == $d['correct']) ? 1 : 0;
-                    $chocie->save();
+                    $choice->save();
                     $y++;
                 }
             }
         }
     }
 
-    public function saveImage(Request $request){
-        $fileName = date().'.'.$request->imageName->getClientOriginalExtension();
-        $request->imageName->move(public_path('storage/question'), $fileName);
+    public function getTabs(){
+        $section = Section::all();
+
+        return $section;
+    }
+
+    public function getTabQuestions($id, $tab){
+        $question = Question::where('set_id', $id)
+        ->when($tab != 0 || $tab == null, function ($query) use($tab){
+            $query->where('section_id', $tab);
+        })->get();
+
+        foreach($question as $q){
+            $q->choice_count = $q->choice_set->count();
+        }
+
+        return $question;
     }
 }

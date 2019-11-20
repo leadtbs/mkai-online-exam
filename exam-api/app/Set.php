@@ -14,9 +14,9 @@ class Set extends Model
 
     protected $hidden = ['password'];
 
-    /*public function question(){
+    public function question(){
         return $this->hasMany('App\Question', 'set_id');
-    }*/
+    }
 
     public $timestamps = false;
 }

@@ -15,6 +15,7 @@ import '@fortawesome/fontawesome-free/js/all.js'
 import VueProgressBar from 'vue-progressbar'
 import Swal from 'sweetalert2'
 import PrettyCheckBox from 'pretty-checkbox-vue'
+import CircularCountDownTimer from "vue-circular-count-down-timer";
 
 const Toast = Swal.mixin({
   toast: true,
@@ -27,6 +28,7 @@ Vue.prototype.$axios = axios
 Vue.prototype.$Swal = Swal
 Vue.prototype.$Toast = Toast
 
+Vue.use(CircularCountDownTimer);
 Vue.use(PrettyCheckBox)
 Vue.use(VueProgressBar, {
     color: '#9BD7D1',

@@ -13,8 +13,8 @@
                         </tr>
                         <tr>
                             <td class="align-middle" style="width:20%"><font-awesome-icon class="fa-fw text-info" icon="clock" />{{ set.time }}</td>
-                            <td class="align-middle" style="width:15%"><font-awesome-icon class="fa-fw text-success" icon="question" />5</td>
-                            <td class="align-middle" style="width:15%"><font-awesome-icon class="fa-fw text-success" icon="star" />5</td>
+                            <td class="align-middle" style="width:15%"><font-awesome-icon class="fa-fw text-success" icon="question" />{{ set.question_count }}</td>
+                            <td class="align-middle" style="width:15%"><font-awesome-icon class="fa-fw text-success" icon="star" />{{ set.choice_count }}</td>
                             <td class="align-middle" style="width:10%">
                                 <b-button variant="primary" size="xs" @click="editSetForm(set)"><font-awesome-icon icon="edit" /></b-button>
                             </td>
@@ -94,7 +94,6 @@ export default {
     data(){
         return {
             editState: false,
-            src: '',
             setList: {},
             options: {
                 format: 'H:mm',
@@ -209,20 +208,6 @@ export default {
     },
     created() {
         this.loadSets();
-        this.$axios.get('api/get_image')
-        .then(({data}) => {
-            //this.src = '/storage/mila.png';
-            console.log(data);
-        })
     }
 }
 </script>
-
-<style scoped>
-
-.set-pick:hover{
-    outline: 1px solid #475C7A !important;
-    cursor: pointer;
-}
-
-</style>

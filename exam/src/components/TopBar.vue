@@ -4,7 +4,6 @@
             <b-navbar-nav><b-nav-item :to="{name: 'home'}">Home</b-nav-item></b-navbar-nav>
             <b-navbar-brand class="mx-auto" href="#">MKAI Online Exam <b-badge pill variant="success">BETA</b-badge></b-navbar-brand>
             <template v-if="authenticated">      
-                <!--<b-navbar-nav><b-nav-item :to="{name: 'admin-dashboard'}">Dashboard</b-nav-item></b-navbar-nav>-->
                 <b-navbar-nav><b-nav-item href="#" @click.prevent="signOut">Logout</b-nav-item></b-navbar-nav>       
             </template>
             <template v-else>

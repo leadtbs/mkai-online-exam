@@ -4,6 +4,7 @@ import store from '@/store'
 
 // STUDENT SIDE -- START
 import Home from '../views/Home.vue'
+import Quiz from '../views/Quiz.vue'
 // STUDENT SIDE -- END
 
 // ADMIN SIDE -- START
@@ -17,6 +18,11 @@ import AddEditQuestions from '../views/Admin/AddEditQuestions.vue'
 Vue.use(VueRouter)
 
 const routes = [
+    {
+        path: '/quiz/:set_id',
+        name: 'quiz',
+        component: Quiz
+    },
     {
         path: '/',
         name: 'home',

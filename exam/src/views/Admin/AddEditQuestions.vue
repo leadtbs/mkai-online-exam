@@ -8,7 +8,7 @@
         />
 
         <div class="card-body" style="min-height: 400px;">
-            <form @submit.prevent="submitQuestion($event)" method="post" enctype="multipart/form-data">
+            <form @submit.prevent="submitQuestion()" method="post" enctype="multipart/form-data">
                 <div class="row">
                     <!-- LEFT -->
                     <div class="col-md-5">
