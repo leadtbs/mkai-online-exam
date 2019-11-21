@@ -30,7 +30,7 @@ class GuestController extends Controller
         }
     }
 
-    public function startQuiz($id){
+    public function startExam($id){
         $set = Set::find($id);
 
         $section = Section::with('question', 'question.choice_set.choices')
@@ -44,7 +44,7 @@ class GuestController extends Controller
         return $set;
     }
 
-    public function submitQuiz(Request $request){
+    public function submitExam(Request $request){
         $scores = [];
         $result = [];
         $total_score = 0; $total_total = 0;

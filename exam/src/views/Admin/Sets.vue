@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="card-header font-weight-bold">
-            Quiz Set List
+            Exam Set List
             <b-button @click="clearForm(); editState=false; $refs['add-set-modal'].show();" variant="success" size="sm" class="float-right">Add Set <font-awesome-icon class="fa-fw" icon="plus-square" /></b-button>
         </div>
         <div class="card-body">

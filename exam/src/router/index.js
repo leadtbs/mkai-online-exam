@@ -4,7 +4,7 @@ import store from '@/store'
 
 // STUDENT SIDE -- START
 import Home from '../views/Home.vue'
-import Quiz from '../views/Quiz.vue'
+import Exam from '../views/Exam.vue'
 // STUDENT SIDE -- END
 
 // ADMIN SIDE -- START
@@ -19,9 +19,9 @@ Vue.use(VueRouter)
 
 const routes = [
     {
-        path: '/quiz/:set_id',
-        name: 'quiz',
-        component: Quiz
+        path: '/exam/:set_id',
+        name: 'exam',
+        component: Exam
     },
     {
         path: '/',
@@ -32,6 +32,7 @@ const routes = [
         path: '/login',
         name: 'login',
         component: Login
+        
     },
     {
         path: '/admin',

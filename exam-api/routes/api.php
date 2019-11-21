@@ -2,8 +2,8 @@
 
 Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function(){
     Route::post('signin', 'SignInController');
-    Route::post('signout', 'SignOutController');
     Route::get('test', 'DataTestController');
+    Route::post('signout', 'SignOutController');
 });
 
 //Admin
@@ -18,6 +18,6 @@ Route::get('questions/{id}/tab/{tab}', 'Admin\QuizController@getTabQuestions');
 
 //Guest
 Route::get('set', 'Guest\GuestController@getSetAll');
-Route::get('start_quiz/{id}', 'Guest\GuestController@startQuiz');
+Route::get('start_exam/{id}', 'Guest\GuestController@startExam');
 Route::post('confirm_password', 'Guest\GuestController@confirmPassword');
-Route::post('submit_quiz', 'Guest\GuestController@submitQuiz');
+Route::post('submit_exam', 'Guest\GuestController@submitExam');

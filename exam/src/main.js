@@ -4,7 +4,6 @@ import router from './router'
 import store from './store'
 import axios from 'axios';
 
-import './urls.js'
 import './assets/app.scss'
 import BootstrapVue from 'bootstrap-vue'
 import { library } from '@fortawesome/fontawesome-svg-core'

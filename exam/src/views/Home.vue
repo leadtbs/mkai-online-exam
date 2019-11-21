@@ -29,7 +29,7 @@ export default {
     },
     methods: {
         startQuiz(id){
-            this.$router.push('/quiz/'+id);
+            this.$router.push('/exam/'+id);
         },
         loadSets(){
             this.$Progress.start();
