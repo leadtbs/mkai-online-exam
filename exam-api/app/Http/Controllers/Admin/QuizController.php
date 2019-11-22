@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use App\Set;
 use App\Section;
 use App\Question;
-use App\Choice_set;
+use App\Choice_Set;
 use App\Choices;
 
 class QuizController extends Controller
