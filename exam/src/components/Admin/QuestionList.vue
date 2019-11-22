@@ -5,7 +5,7 @@
                 <table class="text-center table-bordered m-auto" style="width: 95%">
                     <tr>
                         <td style="height: 100px;" colspan="3" class="align-middle font-weight-bold">
-                            <img :src="$URL+'/img/question/'+question.picture" alt="Question" style="width: 100%;">
+                            <img :src="'/img/question/'+question.picture" alt="Question" style="width: 100%;">
                         </td>
                     </tr>
                     <tr>
@@ -38,7 +38,7 @@ export default {
     },
     mounted() {
         this.$Progress.start();
-        this.$axios.get('/api/questions/'+this.set_id+'/tab/'+this.tab_index)
+        this.$axios.get('api/questions/'+this.set_id+'/tab/'+this.tab_index)
         .then(({data}) => {
             this.questions = data;
             this.$Progress.finish();

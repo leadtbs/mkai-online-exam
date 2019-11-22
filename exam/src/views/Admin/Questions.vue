@@ -36,7 +36,7 @@ export default {
         QuestionList
     },
     mounted() {
-        this.$axios.get('/api/get_tabs')
+        this.$axios.get('api/get_tabs')
         .then(({data}) => {
             this.tabs = data;
         })

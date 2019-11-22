@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import axios from 'axios';
+import axios from 'axios'
 
 import './assets/app.scss'
 import BootstrapVue from 'bootstrap-vue'
@@ -23,6 +23,7 @@ const Toast = Swal.mixin({
   timer: 3000
 })
 
+axios.defaults.baseURL = '/';
 Vue.prototype.$axios = axios
 Vue.prototype.$Swal = Swal
 Vue.prototype.$Toast = Toast
