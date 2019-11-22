@@ -21,7 +21,7 @@ class Question extends Model
     }
 
     public function choice_set(){
-        return $this->hasMany('App\Choice_set', 'question_id');
+        return $this->hasMany('App\Choice_Set', 'question_id');
     }
 
     public $timestamps = false;
