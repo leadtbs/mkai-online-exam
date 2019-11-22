@@ -15,7 +15,7 @@ class Choices extends Model
     protected $hidden = ['correct'];
 
     public function choice_set(){
-        return $this->belongsTo('App\Choice_set', 'choice_set_id');
+        return $this->belongsTo('App\Choice_Set', 'choice_set_id');
     }
 
     public $timestamps = false;
