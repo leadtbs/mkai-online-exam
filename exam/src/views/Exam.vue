@@ -79,7 +79,7 @@
                                 <div class="row">
                                     <div v-for="(choices, index2) in choice_set.choices" :key="index2" class="col-6 col-sm-6 col-md-6 p-1">
                                         <div @click="pick(index, index2)" v-bind:value="index2" class="border mt-3 text-wrap clickable" v-if="choices.choices != ''">
-                                            <img :src="'/img/choices/'+choices.choices" alt="choice" class="w-100 h-100" :class="ifPicked(index, index2)">
+                                            <img :src="$URL+'/img/choices/'+choices.choices" alt="choice" class="w-100 h-100" :class="ifPicked(index, index2)">
                                         </div>
                                     </div>
                                 </div>
