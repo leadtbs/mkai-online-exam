@@ -5,7 +5,7 @@
                 <div class="row">
                     <div v-if="exam" class="col-md-3">
                         <div class="row">
-                            <div class="col-md-12 col-sm-12 col-12">
+                            <div class="mx-auto pl-3">
                                 <circular-count-down-timer style="text-align: center;"
                                     :initial-value="exam.time"
                                     :size="80"
@@ -68,7 +68,7 @@
                         </div>
                     </div>
                     <div v-if="exam" class="col-md-6">
-                        <img :src="'/img/question/'+exam.section[current_section].question[current].picture" alt="question" class="w-100 border">
+                        <img :src="$URL+'/img/question/'+exam.section[current_section].question[current].picture" alt="question" class="w-100 border">
                     </div>
                     <div v-if="exam" class="col-md-3 overflow-auto" style="font-size: 24px; min-height: 100px; max-height: 400px;">
                         <div v-for="(choice_set, index) in exam.section[current_section].question[current].choice_set" :key="index" class="row border border-dark mb-2 pb-2">
@@ -100,7 +100,9 @@
 </template>
 
 <script>
-var audio;
+import jsPDF from 'jspdf'
+import 'jspdf-autotable'
+var audio
 
 export default {
     name: 'exam',
@@ -230,18 +232,20 @@ export default {
                 }
             }
         },
-        pickQuestion(index){
-            this.current = index;
-
+        resetAudio(){
             if(audio){
                 if(this.exam.section[this.current_section].question[this.current].audio_counter != 0){
-                    this.playing = false;
+                    this.playing = false
                 }else{
-                    this.playing = true;
+                    this.playing = true
                 }
-                audio.pause();
-                audio.currentTime = 0;
+                audio.pause()
+                audio.currentTime = 0
             }
+        },
+        pickQuestion(index){
+            this.current = index
+            this.resetAudio()
         },
         nextSection(){
             this.$Swal.fire({
@@ -254,10 +258,11 @@ export default {
                 confirmButtonText: 'Proceed'
             }).then((result) => {
                 if (result.value) {
+                    this.resetAudio()
                     this.current = 0;
-                    this.current_section++;
+                    this.current_section++
                     if(this.current_section == this.exam.section.length-1){
-                        this.submit = true;
+                        this.submit = true
                     }
                 }
             })
@@ -302,21 +307,38 @@ export default {
         submitExam(){
             this.progress[this.current_section].bar++;
             this.submitDisabled = true;
-            this.$axios.post('/api/submit_exam', this.exam, {responseType: 'blob'})
-            .then(response => {
-                const url = window.URL.createObjectURL(new Blob([response.data]));
-                const link = document.createElement('a');
+            this.$axios.post('/api/submit_exam', this.exam)
+            .then(({data}) => {
+                let columns = [
+                    {title: 'Section', dataKey: 'Section'},
+                    {title: 'Score', dataKey: 'Score'},
+                    {title: 'Percent', dataKey: 'Percent'},
+                ];
+
+                let rows = [];
+
+                for(let x = 0; x < data.scores.length; x++){
+                    rows.push([]);
+                    rows[x].push(data.scores[x].section)
+                    rows[x].push(data.scores[x].score)
+                    rows[x].push(data.scores[x].percent)
+                }
                 
-                link.href = url;
-                link.setAttribute('download', 'Result.pdf');
-                document.body.appendChild(link);
-                link.click();
+                let doc = new jsPDF('p', 'pt');
+
+                doc.text(40, 30, 'Set Name: ' + data.set_name)
+
+                doc.autoTable({
+                    head: [columns],
+                    body: rows,
+
+                })
+                
+                doc.save('Result.pdf');
+
                 setTimeout(() => {
                     this.$router.push('/');
                 }, 5000)
-            })
-            .catch(error => {
-                console.log(error);
             })
         }
     },

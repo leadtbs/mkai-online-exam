@@ -48,9 +48,7 @@
                     this.$router.replace({
                         name: 'set'
                     })
-                }).catch(() => {
-                    console.log('Incorrect Credentials');
-                });
+                })
             }
         }
     }

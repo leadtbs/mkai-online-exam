@@ -85,22 +85,12 @@ class GuestController extends Controller
         $html .= '<h1>Set Name: '.$request['name'].'</h1>';
         $html .= '<table border="1"><tbody>';
 
-        foreach($scores as $s){
-            $html .= '<tr>';
-            $html .= '<td style="width: 250px;"><h1>'.$s['section'].'</h1></td>';
-            $html .= '<td style="width: 100px; text-align:center;"><h1>'.$s['score'].'</h1></td>';
-            $html .= '<td style="width: 100px; text-align:center;"><h1>'.$s['percent'].'</h1></td>';
-            $html .= '</tr>';
-        }
-        
-        $html .= '<tbody></table>';
-
-        PDF::SetTitle('Result');
-        PDF::AddPage();
-        PDF::writeHTML($html, false, false, false, false, '');
-
-        ob_end_clean();
-        return PDF::Output();
+        info('mao ni');
+        return 'mao ni';
+        return [
+            'set_name' => $request['name'],
+            'scores' => $scores
+        ];
     }
     
     public function getSetAll(){

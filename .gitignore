@@ -1,6 +1,8 @@
 exam/vue.config.js
 exam/node_modules
 exam/dist
+exam/.env.development
+exam/.env.production
 exam-api/node_modules
 exam-api/public/hot
 exam-api/public/img

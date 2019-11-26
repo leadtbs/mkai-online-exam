@@ -23,7 +23,8 @@ const Toast = Swal.mixin({
   timer: 3000
 })
 
-axios.defaults.baseURL = '/';
+axios.defaults.baseURL = (process.env.NODE_ENV == 'production') ? process.env.VUE_APP_BASE_URL : 'http://localhost:8000';
+Vue.prototype.$URL = (process.env.NODE_ENV == 'production') ? process.env.VUE_APP_BASE_URL : 'http://localhost:8000';
 Vue.prototype.$axios = axios
 Vue.prototype.$Swal = Swal
 Vue.prototype.$Toast = Toast
