@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Intervention\Image\ImageManagerStatic as Image;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -10,6 +11,7 @@ use App\Section;
 use App\Question;
 use App\Choice_Set;
 use App\Choices;
+use ImageOptimizer;
 
 class QuizController extends Controller
 {
@@ -74,6 +76,9 @@ class QuizController extends Controller
         $filename = (sha1(time().$request->image->getClientOriginalName())).'.'.$fileextension;
 
         $request->image->move(public_path('img/question'), $filename);
+
+        //$img = Image::make($request->image);
+        //$img->resize(500, 500)->save(public_path('img/question/'.$filename));
 
         $question->picture = $filename;
 

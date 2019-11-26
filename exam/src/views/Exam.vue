@@ -223,7 +223,7 @@ export default {
             if(this.exam.section[this.current_section].question[this.current].audio_counter != 0){
                 this.exam.section[this.current_section].question[this.current].audio_counter--;
                 this.playing = true;
-                audio = new Audio('/audio/'+audioFile);
+                audio = new Audio(this.$URL+'/audio/'+audioFile);
                 audio.play();
                 audio.onended = () => {
                     if(this.exam.section[this.current_section].question[this.current].audio_counter != 0){
