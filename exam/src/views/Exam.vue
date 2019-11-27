@@ -161,10 +161,20 @@ export default {
                                     preload_image.src = this.$URL+'/img/question/'+data.section[x].question[y].picture;
 
                                     if(data.section[x].question[y].audio){
+                                        const preload_audio = new Audio();
+                                        preload_audio.src = this.$URL+'/audio/'+data.section[x].question[y].audio;
                                         data.section[x].question[y].audio_counter = 2;
                                     }
 
                                     for(let z = 0; z < data.section[x].question[y].choice_set.length; z++){
+
+                                        if(data.section[x].question[y].choice_type === '1'){
+                                            for(let i = 0; i < data.section[x].question[y].choice_set[z].choices.length; i++){
+                                                const preload_choice = new Image();
+                                                preload_choice.src = this.$URL+'/img/choices/'+data.section[x].question[y].choice_set[z].choices[i].choices;
+                                            }
+                                        }
+
                                         data.section[x].question[y].choice_set[z].picked = null;
                                         data.section[x].question[y].choice_set[z].choices = this.shuffle(data.section[x].question[y].choice_set[z].choices);
                                     }
