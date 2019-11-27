@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Intervention\Image\ImageManagerStatic as Image;
+//use Intervention\Image\ImageManagerStatic as Image;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -11,7 +11,7 @@ use App\Section;
 use App\Question;
 use App\Choice_Set;
 use App\Choices;
-use ImageOptimizer;
+//use ImageOptimizer;
 
 class QuizController extends Controller
 {
