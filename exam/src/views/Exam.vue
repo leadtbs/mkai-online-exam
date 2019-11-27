@@ -157,6 +157,9 @@ export default {
 
                                 for(let y = 0; y < data.section[x].question.length; y++){
 
+                                    const preload_image = new Image();
+                                    preload_image.src = this.$URL+'/img/question/'+data.section[x].question[y].picture;
+
                                     if(data.section[x].question[y].audio){
                                         data.section[x].question[y].audio_counter = 2;
                                     }
