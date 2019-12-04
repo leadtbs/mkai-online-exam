@@ -325,7 +325,8 @@ export default {
                 let columns = [
                     {title: 'Section', dataKey: 'Section'},
                     {title: 'Score', dataKey: 'Score'},
-                    {title: 'Percent', dataKey: 'Percent'},
+                    {title: 'Passing Score', dataKey: 'Passing'},
+                    {title: 'Status', dataKey: 'Status'},
                 ];
 
                 let rows = [];
@@ -334,7 +335,8 @@ export default {
                     rows.push([]);
                     rows[x].push(data.scores[x].section)
                     rows[x].push(data.scores[x].score)
-                    rows[x].push(data.scores[x].percent)
+                    rows[x].push(data.scores[x].passing)
+                    rows[x].push(data.scores[x].status)
                 }
                 
                 let doc = new jsPDF('p', 'pt');
@@ -373,6 +375,12 @@ export default {
         },
     },
     created() {
+        window.addEventListener('keydown', (e) => {
+            if(e.key == 'Enter'){
+                this.nextQuestion();
+            }
+        })
+
         this.startExam();
     }
 }

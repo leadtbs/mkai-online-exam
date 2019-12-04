@@ -154,4 +154,9 @@ class QuizController extends Controller
 
         return $question;
     }
+
+    public function getQuestionsAndChoices($question_id){
+        $question = Question::find($question_id);
+        return $question;
+    }
 }

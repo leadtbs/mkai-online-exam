@@ -15,6 +15,7 @@ Route::get('tab_name/{id}', 'Admin\QuizController@tabName');
 Route::post('submit', 'Admin\QuizController@submitQuestionForm');
 Route::get('get_tabs', 'Admin\QuizController@getTabs');
 Route::get('questions/{id}/tab/{tab}', 'Admin\QuizController@getTabQuestions');
+Route::get('get-questions-and-choices/{question_id}', 'Admin\QuizController@getQuestionsAndChoices');
 
 //Guest
 Route::get('set', 'Guest\GuestController@getSetAll');
