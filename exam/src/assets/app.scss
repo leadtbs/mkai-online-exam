@@ -2,9 +2,15 @@
 @import 'node_modules/bootstrap-vue/src/index.scss';
 @import 'node_modules/pretty-checkbox/src/pretty-checkbox.scss';
 
-body{
-    font-family: "roboto";
+@font-face{
+    font-family: 'Roboto';
+    src: url('fonts/Roboto-Regular.woff2') format('woff2');
 }
+
+body{
+    font-family: 'Roboto';
+}
+
 
 .btn-group-xs > .btn, .btn-xs {
     padding  : .25rem .4rem !important;

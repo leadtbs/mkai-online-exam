@@ -1,9 +1,11 @@
 <template>
     <div class="card-header font-weight-bold">
-        <router-link :to="(addCounter) ? { name: 'question' } : { name: 'set' }" class="btn btn-xs btn-info mr-3"><font-awesome-icon class="fa-fw" size="lg" icon="angle-left" /></router-link>
-        <span v-if="addCounter">Add</span> Questions for <span class="text-primary">{{ setName }} </span>
+        <router-link :to="(addCounter || editCounter) ? { name: 'question' } : { name: 'set' }" class="btn btn-xs btn-info mr-3"><font-awesome-icon class="fa-fw" size="lg" icon="angle-left" /></router-link>
+        <span v-if="addCounter">Add </span>  
+        <span v-if="editCounter">Edit Question</span>
+        <span v-else>Questions for <span class="text-primary">{{ setName }} </span></span>
         <span v-if="addCounter">under <span class="text-info">{{ tabName }}</span></span>
-        <template v-if="addCounter">
+        <template v-if="addCounter || editCounter">
             <b-button @click="addChoiceForm" variant="success" size="sm" class="float-right">Add Choices <font-awesome-icon class="fa-fw" icon="plus-square" /></b-button>
             <div class="float-right mr-3">
                 <p-check v-model="choice_type" @change="choiceTypeChange" class="p-icon p-plain p-smooth" toggle style="font-size: 25px;">
@@ -22,7 +24,7 @@
 <script>
 export default {
     props: [
-        'tab_index', 'addCounter'
+        'tab_index', 'addCounter', 'editCounter'
     ],
     data() {
         return {
@@ -33,7 +35,7 @@ export default {
     },
     methods: {
         addQuestion(tab_index){
-            this.$router.push({ name: 'add_edit_question', params: {tab_index} })
+            this.$router.push({ name: 'add_question', params: {tab_index} })
         },
         choiceTypeChange(){
             this.$emit('triggerChoiceTypeChange', this.choice_type);
@@ -48,7 +50,7 @@ export default {
             this.setName = data
         })
 
-        if(this.addCounter){
+        if(this.addCounter && this.tab_index){
             this.$axios.get('/api/tab_name/'+this.tab_index)
             .then(({ data }) => {
                 this.tabName = data;

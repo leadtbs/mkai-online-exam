@@ -11,7 +11,7 @@
                     <tr>
                         <td class="align-middle" style="width: 15%"><font-awesome-icon class="fa-fw text-success" icon="star" />{{ question.choice_count }}</td>
                         <td class="align-middle" style="width: 10%">
-                            <button class="btn btn-xs btn-primary"><font-awesome-icon icon="edit" /></button>
+                            <button class="btn btn-xs btn-primary" @click="editQuestion(question.id)"><font-awesome-icon icon="edit" /></button>
                         </td>
                         <td class="align-middle" style="width: 10%">
                             <button class="btn btn-xs btn-danger"><font-awesome-icon icon="trash" /></button>
@@ -34,7 +34,9 @@ export default {
         }
     },
     methods: {
-
+        editQuestion(question_id){
+            this.$router.push({ name: 'edit_question', params: {question_id} });
+        }
     },
     mounted() {
         this.$Progress.start();

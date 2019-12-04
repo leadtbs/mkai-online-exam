@@ -4,7 +4,7 @@
             :tab_index="$route.params.tab_index"
             v-on:triggerChoiceTypeChange="choiceTypeChange"
             v-on:triggerAddChoiceForm="addChoiceForm"
-            addCounter="true"
+            addCounter="add"
         />
 
         <div class="card-body" style="min-height: 400px;">
@@ -115,7 +115,7 @@
 import QuestionCardHeader from '@/components/Admin/QuestionCardHeader'
 
 export default {
-    name: 'addEditQuestion',
+    name: 'addQuestion',
     data() {
         return {
             imgName: 'Choose Image',

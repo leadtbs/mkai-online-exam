@@ -92,19 +92,20 @@ class GuestController extends Controller
     }
     
     public function getSetAll(){
-        $set = Set::with('question.choice_set.choices')->get();
-
-        foreach($set as $s){
-            $s->question_count = $s->question->count();
-            if(!($s->question->isEmpty())){
-                foreach($s->question as $q){
+        $temp = Set::with('question.choice_set.choices')->get();
+        $set = Set::all();
+        
+        for($x = 0; $x < count($set); $x++){
+            $set[$x]['question_count'] = $temp[$x]['question']->count();
+            $choice_count = 0;
+            if(!($temp[$x]['question']->isEmpty())){
+                foreach($temp[$x]['question'] as $q){
                     foreach($q->choice_set as $cs){
-                        $s->choice_count++;
+                        $choice_count++;
                     }
                 }
-            }else{
-                $s->choice_count = 0;
             }
+            $set[$x]['choice_count'] = $choice_count;
         }
 
         return $set;
