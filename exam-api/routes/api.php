@@ -13,6 +13,7 @@ Route::delete('save_set/{id}', 'Admin\QuizController@deleteSet');
 Route::get('set_name/{id}', 'Admin\QuizController@setName');
 Route::get('tab_name/{id}', 'Admin\QuizController@tabName');
 Route::post('submit', 'Admin\QuizController@submitQuestionForm');
+Route::post('update-question', 'Admin\QuizController@updateQuestion');
 Route::get('get_tabs', 'Admin\QuizController@getTabs');
 Route::get('questions/{id}/tab/{tab}', 'Admin\QuizController@getTabQuestions');
 Route::get('get-questions-and-choices/{question_id}', 'Admin\QuizController@getQuestionsAndChoices');

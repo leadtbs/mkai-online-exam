@@ -11,6 +11,7 @@ use App\Section;
 use App\Question;
 use App\Choice_Set;
 use App\Choices;
+use File;
 //use ImageOptimizer;
 
 class QuizController extends Controller
@@ -84,7 +85,6 @@ class QuizController extends Controller
 
         if($request->hasFile('audio')){
             $fileextension = $request->audio->getClientOriginalExtension();
-            $encryption =
             $filename = (sha1(time().$request->audio->getClientOriginalName())).'.'.$fileextension;
             $request->audio->move(public_path('audio'), $filename);
             $question->audio = $filename;
@@ -136,6 +136,72 @@ class QuizController extends Controller
         }
     }
 
+    public function updateQuestion(Request $request){
+        $decoded = json_decode($request->data, true);
+        
+        $question = Question::find($decoded['id']);
+
+        if($request->hasFile('image')){
+            $fileextension = $request->image->getClientOriginalExtension();
+            $filename = (sha1(time().$request->image->getClientOriginalName())).'.'.$fileextension;
+            $request->image->move(public_path('img/question'), $filename);
+            $image_path = public_path().'/img/question/'.$question->picture;
+            File::delete($image_path);
+            $question->picture = $filename;
+        }
+
+        if($request->hasFile('audio')){
+            $fileextension = $request->audio->getClientOriginalExtension();
+            $filename = (sha1(time().$request->audio->getClientOriginalName())).'.'.$fileextension;
+            $request->audio->move(public_path('audio'), $filename);
+            $audio_path = public_path().'/audio\/'.$question->audio;
+            File::delete($audio_path);
+            $question->audio = $filename;
+        }
+
+        $question->save();
+
+        foreach($decoded['choice_set'] as $d){
+            $choice_set = Choice_Set::find($d['id']);
+            $choice_set->description = $d['description'];
+            foreach($d['choices'] as $key => $c){
+                $choices = Choices::find($c['id']);
+                if($d['correct'] === $key){
+                    $choices->correct = 1;
+                }else{
+                    $choices->correct = 0;
+                }
+                $choices->save();
+            }
+            $choice_set->save();
+        }
+
+        if($request->choice_id){
+            for($x = 0; $x < count($request->choice_id); $x++){
+                for($y = 0; $y < count($request->choice_id[$x]); $y++){
+                    $id = $request->choice_id[$x][$y];
+                    $choice = Choices::find($id);
+                    $choices = $request->choices;
+                    $fileextension = $choices[$x][$y]->getClientOriginalExtension();
+                    $filename = (sha1(time().$choices[$x][$y]->getClientOriginalName())).'.'.$fileextension;
+                    $choices[$x][$y]->move(public_path('img/choices'), $filename);
+                    $choice_path = public_path().'/img/choices/'.$choice->choices;
+                    File::delete($choice_path);
+                    $choice->choices = $filename;
+                    $choice->save();
+                }
+            }
+        }else{
+            foreach($decoded['choice_set'] as $d){
+                foreach($d['choices'] as $c){
+                    $choice = Choices::find($c['id']);
+                    $choice->choices = $c['choices'];
+                    $choice->save();
+                }
+            }
+        }
+    }
+
     public function getTabs(){
         $section = Section::all();
 
@@ -156,7 +222,23 @@ class QuizController extends Controller
     }
 
     public function getQuestionsAndChoices($question_id){
-        $question = Question::find($question_id);
+        $question = Question::with('choice_set.choices')->find($question_id);
+
+        foreach($question->choice_set as $cs){
+            $x = 0;
+            foreach($cs->choices as $c){
+                $correct = Choices::where('id', $c->id)->pluck('correct');
+                $c->choice_url = '';
+                if($correct[0] === 1){
+                    $cs->correct = $x;
+                    $x++;
+                    break;
+                }else{
+                    $cs->correct = '';
+                }
+                $x++;
+            }
+        }
         return $question;
     }
 }

@@ -6,9 +6,9 @@
         <span v-else>Questions for <span class="text-primary">{{ setName }} </span></span>
         <span v-if="addCounter">under <span class="text-info">{{ tabName }}</span></span>
         <template v-if="addCounter || editCounter">
-            <b-button @click="addChoiceForm" variant="success" size="sm" class="float-right">Add Choices <font-awesome-icon class="fa-fw" icon="plus-square" /></b-button>
+            <b-button v-if="addCounter" @click="addChoiceForm" variant="success" size="sm" class="float-right">Add Choices <font-awesome-icon class="fa-fw" icon="plus-square" /></b-button>
             <div class="float-right mr-3">
-                <p-check v-model="choice_type" @change="choiceTypeChange" class="p-icon p-plain p-smooth" toggle style="font-size: 25px;">
+                <p-check v-if="addCounter" v-model="choice_type" @change="choiceTypeChange" class="p-icon p-plain p-smooth" toggle style="font-size: 25px;">
                     <i slot="extra" class="icon fa fa-image text-primary"></i>
                     <i slot="off-extra" class="icon fa fa-font text-info"></i>
                 </p-check>

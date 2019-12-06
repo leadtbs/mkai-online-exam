@@ -18,11 +18,10 @@ class GuestController extends Controller
         $id = $request->id;
         $set = Set::find($id);
         if(Hash::check($request->password, $set->password)){
-            $section = Section::with('question', 'question.choice_set.choices')
-                ->whereHas('question', function($query) use($id){
-                    $query->where('set_id', $id);
-                })->get();
-    
+            $section = Section::with(['question' => function($query) use($id){
+                $query->with('choice_set.choices')->where('set_id', $id);
+            }])->get();
+                
             $set->section = $section;
             return $set;
         }else{
