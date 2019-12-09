@@ -202,6 +202,11 @@ class QuizController extends Controller
         }
     }
 
+    public function deleteQuestion($id){
+        $question = Question::findOrFail($id);
+        $question->delete();
+    }
+
     public function getTabs(){
         $section = Section::all();
 

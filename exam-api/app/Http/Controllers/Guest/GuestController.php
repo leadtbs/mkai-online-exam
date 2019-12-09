@@ -17,12 +17,14 @@ class GuestController extends Controller
     public function confirmPassword(Request $request){
         $id = $request->id;
         $set = Set::find($id);
-        if(Hash::check($request->password, $set->password)){
+        if(Hash::check($request->form['password'], $set->password)){
             $section = Section::with(['question' => function($query) use($id){
                 $query->with('choice_set.choices')->where('set_id', $id);
             }])->get();
                 
             $set->section = $section;
+            $set->stud_name = $request->form['name'];
+            $set->stud_sensei = $request->form['sensei'];
             return $set;
         }else{
             return 'wrong';
@@ -88,6 +90,8 @@ class GuestController extends Controller
 
         return [
             'set_name' => $request['name'],
+            'stud_name' =>$request['stud_name'],
+            'stud_sensei' =>$request['stud_sensei'],
             'scores' => $scores
         ];
     }

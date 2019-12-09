@@ -94,6 +94,53 @@
                 </div>
             </div>
         </div>
+
+        <b-modal centered
+            id="password-modal"
+            ref="password-modal"
+            title="Enter Info"
+            ok-title="Submit"
+            @ok="startExam">
+            <b-form @submit.prevent="startExam">
+
+                <b-form-group>
+                    <b-form-input
+                        autocomplete="off" 
+                        type="text"
+                        required
+                        placeholder="Enter Your Name"
+                        v-model="form.name"
+                    >
+                    </b-form-input>
+                </b-form-group>
+
+                <b-form-group>
+                    <b-form-input
+                        autocomplete="off" 
+                        placeholder="Enter Your Teacher's Name"
+                        required
+                        v-model="form.sensei"
+                    >
+                    </b-form-input>
+                </b-form-group>
+
+                <b-form-group>
+                    <b-form-input
+                        autocomplete="off" 
+                        type="password"
+                        placeholder="Enter Set Password"
+                        required
+                        v-model="form.password"
+                    >
+                    </b-form-input>
+                </b-form-group>
+
+                <b-form-group class="d-none">
+                    <b-button type="submit">Submit</b-button>
+                </b-form-group>
+
+            </b-form>
+        </b-modal>
     </div>
 </template>
 
@@ -106,6 +153,11 @@ export default {
     name: 'exam',
     data() {
         return {
+            form: {
+                name: '',
+                sensei: '',
+                password: ''
+            },
             variant: ['info', 'danger', 'primary', 'success'],
             max: 0,
             progress: [
@@ -130,66 +182,63 @@ export default {
 
             return array;
         },
+        initExam(){
+            this.$refs['password-modal'].show();
+        },
         startExam(){
-            this.$Swal.fire({
-                title: 'Enter Set Password',
-                input: 'password',
-                inputAttributes: {
-                    autocapitalize: 'off'
-                },
-                showCancelButton: true,
-                confirmButtonText: 'Submit',
-            }).then((result) => {
-                if (result.value) {
-                    this.$axios.post('/api/confirm_password', {
-                        password: result.value,
-                        id: this.$route.params.set_id
-                    })
-                    .then(({data}) => {
-                        if(data !== 'wrong'){
-                            this.max = data.section.length * 100;
-                            for(let x = 0; x < data.section.length; x++){
+            this.$axios.post('/api/confirm-password', {
+                form: this.form,
+                id: this.$route.params.set_id
+            })
+            .then(({data}) => {
+                if(data !== 'wrong'){
+                    this.max = data.section.length * 100;
+                    for(let x = 0; x < data.section.length; x++){
 
-                                this.progress.push({bar: 0, max: data.section[x].question.length});
-                                data.section[x].question = this.shuffle(data.section[x].question);
+                        this.progress.push({bar: 0, max: data.section[x].question.length});
+                        data.section[x].question = this.shuffle(data.section[x].question);
 
-                                for(let y = 0; y < data.section[x].question.length; y++){
+                        for(let y = 0; y < data.section[x].question.length; y++){
 
-                                    const preload_image = new Image();
-                                    preload_image.src = this.$URL+'/img/question/'+data.section[x].question[y].picture;
+                            const preload_image = new Image();
+                            preload_image.src = this.$URL+'/img/question/'+data.section[x].question[y].picture;
 
-                                    if(data.section[x].question[y].audio){
-                                        const preload_audio = new Audio();
-                                        preload_audio.src = this.$URL+'/audio/'+data.section[x].question[y].audio;
-                                        data.section[x].question[y].audio_counter = 2;
-                                    }
+                            if(data.section[x].question[y].audio){
+                                const preload_audio = new Audio();
+                                preload_audio.src = this.$URL+'/audio/'+data.section[x].question[y].audio;
+                                data.section[x].question[y].audio_counter = 2;
+                            }
 
-                                    for(let z = 0; z < data.section[x].question[y].choice_set.length; z++){
+                            for(let z = 0; z < data.section[x].question[y].choice_set.length; z++){
 
-                                        if(data.section[x].question[y].choice_type === '1'){
-                                            for(let i = 0; i < data.section[x].question[y].choice_set[z].choices.length; i++){
-                                                const preload_choice = new Image();
-                                                preload_choice.src = this.$URL+'/img/choices/'+data.section[x].question[y].choice_set[z].choices[i].choices;
-                                            }
-                                        }
-
-                                        data.section[x].question[y].choice_set[z].picked = null;
-                                        data.section[x].question[y].choice_set[z].choices = this.shuffle(data.section[x].question[y].choice_set[z].choices);
+                                if(data.section[x].question[y].choice_type === '1'){
+                                    for(let i = 0; i < data.section[x].question[y].choice_set[z].choices.length; i++){
+                                        const preload_choice = new Image();
+                                        preload_choice.src = this.$URL+'/img/choices/'+data.section[x].question[y].choice_set[z].choices[i].choices;
                                     }
                                 }
+
+                                data.section[x].question[y].choice_set[z].picked = null;
+                                data.section[x].question[y].choice_set[z].choices = this.shuffle(data.section[x].question[y].choice_set[z].choices);
                             }
-                            this.exam = data;
                         }
-                        else{
-                            this.$Swal.fire({
-                                type: 'error',
-                                title: 'Wrong Password',
-                                text: 'Try again or call attention of sensei',
-                            }).then(() => {
-                                this.startExam();
-                            })
+                    }
+                    this.exam = data;
+
+                    this.$refs['password-modal'].hide();
+                
+                    /*window.addEventListener('keydown', (e) => {
+                        if(e.key == 'Enter'){
+                            this.nextQuestion();
                         }
-                    })
+                    });*/
+                }else{
+                    this.$Toast.fire({
+                        icon: 'warning',
+                        title: 'Wrong Password, Try Again'
+                    });
+                    this.form.password = '';
+                    this.initExam();
                 }
             })
         },
@@ -339,12 +388,14 @@ export default {
                 
                 let doc = new jsPDF('p', 'pt');
 
-                doc.text(40, 30, 'Set Name: ' + data.set_name)
+                doc.text('Set Name: ' + data.set_name, 40, 30)
+                doc.text('Student Name: ' + data.stud_name, 40, 50)
+                doc.text(40, 70, 'Sensei: ' + data.stud_sensei)
 
                 doc.autoTable({
                     head: [columns],
                     body: rows,
-
+                    margin: {top:80}
                 })
                 
                 doc.save('Result.pdf');
@@ -373,13 +424,9 @@ export default {
         },
     },
     created() {
-        window.addEventListener('keydown', (e) => {
-            if(e.key == 'Enter'){
-                this.nextQuestion();
-            }
-        })
-
-        this.startExam();
+    },
+    mounted() {
+        this.initExam();
     }
 }
 </script>
