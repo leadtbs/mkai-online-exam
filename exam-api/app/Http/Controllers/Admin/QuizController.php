@@ -234,7 +234,7 @@ class QuizController extends Controller
             foreach($cs->choices as $c){
                 $correct = Choices::where('id', $c->id)->pluck('correct');
                 $c->choice_url = '';
-                if($correct[0] === 1){
+                if($correct[0] == 1){
                     $cs->correct = $x;
                     $x++;
                     break;
