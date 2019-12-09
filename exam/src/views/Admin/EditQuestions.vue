@@ -55,6 +55,7 @@
                                 <div class="col-md-12">
                                     <template v-if="question.choice_type == false">
                                         <div class="form-group">
+                                            {{ cs }}
                                             <div class="row" v-for="index2 in 4" :key="index2">
                                                 <p-radio :name="'choice_' + index" v-model="cs.correct" v-bind:value="index2-1"
                                                     class="p-icon p-round p-jelly mt-2 ml-3 mr-0 pull-left col-md-1 col-sm-1" 

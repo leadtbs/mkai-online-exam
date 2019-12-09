@@ -118,7 +118,7 @@ class QuizController extends Controller
                         $choice = new Choices;
                         $choice->choices = null;
                     }
-                    $choice->correct = ($y == $d['correct']) ? 1 : 0;
+                    $choice->correct = ($y === $d['correct']) ? 1 : 0;
                     $choice->save();
                 }
             }
@@ -128,7 +128,7 @@ class QuizController extends Controller
                     $choice->choice_set()->associate($choice_set);
 
                     $choice->choices = $c['choice'];
-                    $choice->correct = ($y == $d['correct']) ? 1 : 0;
+                    $choice->correct = ($y === $d['correct']) ? 1 : 0;
                     $choice->save();
                     $y++;
                 }
