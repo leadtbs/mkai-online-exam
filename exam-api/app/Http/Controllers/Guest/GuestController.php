@@ -72,16 +72,16 @@ class GuestController extends Controller
 
             data_set($result, 'section', $s['name']);
             data_set($result, 'score', $score . '/' . $total . ' ('. round(($score / $total) * 100) . '%)');
-            data_set($result, 'passing', round($total * .80));
-            data_set($result, 'status', (round(($score / $total) * 100) >= 80) ? 'Passed' : 'Failed');
+            data_set($result, 'passing', ceil($total * .80));
+            data_set($result, 'status', ((($score / $total) * 100) >= 80) ? 'Passed' : 'Failed');
             array_push($scores, $result);
         }
 
         data_set($result, 'section', 'TOTAL');
         data_set($result, 'score', $total_score . '/' . $total_total . ' (' . round(($total_score / $total_total) * 100) . '%)');
-        data_set($result, 'passing', round($total_total * .80));
-        data_set($result, 'status', (round(($score / $total_total) * 100) >= 80) ? 'Passed' : 'Failed');
-        array_push($scores, $result);
+        data_set($result, 'passing', ceil($total_total * .80));
+        data_set($result, 'status', ((($total_score / $total_total) * 100) >= 80) ? 'Passed' : 'Failed');
+        array_push($scores, $result);   
 
         $html = '';
         

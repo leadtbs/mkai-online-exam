@@ -398,7 +398,7 @@ export default {
                     margin: {top:80}
                 })
                 
-                doc.save('Result.pdf');
+                doc.save(data.set_name + ' - ' + data.stud_name + ' Result.pdf');
 
                 setTimeout(() => {
                     this.$router.push('/');
