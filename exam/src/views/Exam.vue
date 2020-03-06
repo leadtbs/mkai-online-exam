@@ -96,7 +96,7 @@
             </div>
         </div>
 
-        <b-modal centered
+        <b-modal centered no-close-on-backdrop no-close-on-esc hide-footer
             id="password-modal"
             ref="password-modal"
             title="Enter Info"
@@ -136,19 +136,18 @@
                     </b-form-input>
                 </b-form-group>
 
-                <b-form-group class="d-none">
-                    <b-button type="submit">Submit</b-button>
+                <b-form-group>
+                    <b-button type="submit" :disabled="submitInfo" variant="primary">Submit</b-button>
                 </b-form-group>
 
             </b-form>
         </b-modal>
 
-        <b-modal centered
+        <b-modal centered no-close-on-backdrop no-close-on-esc
             id="loading-modal"
             ref="loading-modal"
             title="Loading Assets... Please Wait "
-            hide-footer
-            @ok="startExam">
+            hide-footer>
             <b-progress :max="totalAssets" animated>
                 <b-progress-bar :value="assetsLoaded" :label="`${Math.round((assetsLoaded/totalAssets) * 100)}%`"></b-progress-bar>
             </b-progress>
@@ -184,6 +183,8 @@ export default {
             allLoaded: false,
             examStart: false,
             exam: null,
+            submitInfo: false,
+            timeSpent: [0, 0, 0, 0]
         }
     },
     methods: {
@@ -202,6 +203,7 @@ export default {
             this.$refs['password-modal'].show();
         },
         startExam(){
+            this.submitInfo = true;
             this.$axios.post('/api/confirm-password', {
                 form: this.form,
                 id: this.$route.params.set_id
@@ -284,6 +286,7 @@ export default {
                     });
                     this.form.password = '';
                     this.initExam();
+                    this.submitInfo = false;
                 }
             })
         },
@@ -416,16 +419,36 @@ export default {
             .then(({data}) => {
                 let columns = [
                     {title: 'Section', dataKey: 'Section'},
+                    {title: 'Time Spent', dataKey: 'TimeSpent'},
                     {title: 'Score', dataKey: 'Score'},
                     {title: 'Passing Score', dataKey: 'Passing'},
                     {title: 'Status', dataKey: 'Status'},
                 ];
 
                 let rows = [];
+                let timeSpentEach = [];
+                let timeSpentAll = 0;
+
+                for(let x = 0; x < this.timeSpent.length; x++){
+                    let h = Math.floor(this.timeSpent[x] / 3600);
+                    let m = Math.floor((this.timeSpent[x] - h*3600) / 60);
+                    let s = Math.floor((this.timeSpent[x]) - (h*3600) - (m*60));
+                    timeSpentEach[x] = h + ':' + ((m.toString().length == 1) ? '0'+m : m) + ':' + (s.toString().length == 1 ? '0'+s : s);
+                    timeSpentAll += this.timeSpent[x];
+                }
+
+                let h = Math.floor(timeSpentAll / 3600);
+                let m = Math.floor((timeSpentAll - h*3600) / 60);
+                let s = Math.floor(timeSpentAll - (h*3600) - (m*60));
+
+                timeSpentAll = h + ':' + ((m.toString().length == 1) ? '0'+m : m) + ':' + (s.toString().length == 1 ? '0'+s : s);
+
+                timeSpentEach.push(timeSpentAll);
 
                 for(let x = 0; x < data.scores.length; x++){
                     rows.push([]);
                     rows[x].push(data.scores[x].section)
+                    rows[x].push(timeSpentEach[x])
                     rows[x].push(data.scores[x].score)
                     rows[x].push(data.scores[x].passing)
                     rows[x].push(data.scores[x].status)
@@ -436,11 +459,22 @@ export default {
                 doc.text('Set Name: ' + data.set_name, 40, 30)
                 doc.text('Student Name: ' + data.stud_name, 40, 50)
                 doc.text(40, 70, 'Sensei: ' + data.stud_sensei)
+                
+                let d = new Date();
+                let date = d.getMonth() + '/' + d.getDay() + '/' + d.getFullYear();
+                let minutes = d.getMinutes();
+                if(minutes.toString().length == 1){
+                    minutes = '0' + minutes;
+                }
+
+                let time = d.getHours() + ':' + minutes;
+
+                doc.text('Date & Time: ' + date + ' ' + time, 40, 90)
 
                 doc.autoTable({
                     head: [columns],
                     body: rows,
-                    margin: {top:80}
+                    margin: {top:100}
                 })
                 
                 doc.save(data.set_name + ' - ' + data.stud_name + ' Result.pdf');
@@ -448,6 +482,19 @@ export default {
                 setTimeout(() => {
                     this.$router.push('/');
                 }, 5000)
+            })
+            .catch(() => {
+                this.$Swal.fire({
+                    icon: 'warning',
+                    title: 'No Internet Connection!',
+                    text: 'Please check connection and try again',
+                    allowOutsideClick: false,
+                    confirmButtonText: 'Submit again'
+                }).then((result) => {
+                    if(result.value) {
+                        this.submitExam();
+                    }
+                });
             })
         }
     },
@@ -487,11 +534,15 @@ export default {
                         timer: 2500,
                         onClose: () => {
                             this.examStart = true;
+                            
+                            setInterval(() => {
+                                this.timeSpent[this.current_section]++;
+                            }, 1000)
                         }
                     })
                 }, 1500);
             }
-        }
+        },
     },
     created() {
     },
