@@ -273,10 +273,10 @@ export default {
                             }
                         }
                     }
-                    
+
                     this.$refs['password-modal'].hide();
-                    this.exam = data;
                     this.$refs['loading-modal'].show();
+                    this.exam = data;
                 }else{
                     this.$Toast.fire({
                         icon: 'warning',
