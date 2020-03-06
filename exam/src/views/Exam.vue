@@ -68,8 +68,7 @@
                 </div>
 
                 <div v-if="examStart" class="col-md-6">
-
-                    <img :src="$URL+'/img/question/'+exam.section[current_section].question[current].picture" alt="question" class="w-100 border">-
+                    <img :src="$URL+'/img/question/'+exam.section[current_section].question[current].picture" alt="question" class="w-100 border">
                 </div>
                 <div v-if="examStart" class="col-md-3 overflow-auto" style="font-size: 24px; min-height: 100px; max-height: 400px;">
                     <div v-for="(choice_set, index) in exam.section[current_section].question[current].choice_set" :key="index" class="row border border-dark mb-2 pb-2">
