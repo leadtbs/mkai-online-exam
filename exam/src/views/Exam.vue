@@ -273,9 +273,9 @@ export default {
                             }
                         }
                     }
-                    this.exam = data;
-
+                    
                     this.$refs['password-modal'].hide();
+                    this.exam = data;
                     this.$refs['loading-modal'].show();
                 }else{
                     this.$Toast.fire({
