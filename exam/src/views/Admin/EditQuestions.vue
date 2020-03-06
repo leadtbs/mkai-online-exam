@@ -217,7 +217,6 @@ export default {
         initQuestion(){
             this.$axios.get('api/get-questions-and-choices/'+this.$route.params.question_id)
             .then(({data}) => {
-                console.log(data);
                 this.question = data;
                 this.question.img_url = '';
                 this.question.audio_url = '';

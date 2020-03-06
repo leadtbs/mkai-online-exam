@@ -2,7 +2,7 @@
     <div class="card mt-5 justify-content-center">
         <div class="card-body">
             <div class="row">
-                <div v-if="exam" class="col-md-3">
+                <div v-if="examStart" class="col-md-3">
                     <div class="row">
                         <div class="mx-auto pl-3">
                             <circular-count-down-timer style="text-align: center;"
@@ -16,7 +16,7 @@
                         </div>
                     </div>
 
-                    <div class="row mt-3 text-center" v-if="exam">
+                    <div class="row mt-3 text-center" v-if="examStart">
                         <div class="col-md-12 font-weight-bold" :class="sectionColor">
                             {{ exam.section[current_section].name }}
                         </div>
@@ -32,7 +32,7 @@
                         </div>
                     </div>
 
-                    <div class="row mt-5 mb-2" v-if="exam">
+                    <div class="row mt-5 mb-2" v-if="examStart">
                         <div class="col-md-9 text-center m-auto">
                             <button
                                 v-for="(question, index) in exam.section[current_section].question"
@@ -66,10 +66,12 @@
                         </div>
                     </div>
                 </div>
-                <div v-if="exam" class="col-md-6">
-                    <img :src="$URL+'/img/question/'+exam.section[current_section].question[current].picture" alt="question" class="w-100 border">
+
+                <div v-if="examStart" class="col-md-6">
+
+                    <img :src="$URL+'/img/question/'+exam.section[current_section].question[current].picture" alt="question" class="w-100 border">-
                 </div>
-                <div v-if="exam" class="col-md-3 overflow-auto" style="font-size: 24px; min-height: 100px; max-height: 400px;">
+                <div v-if="examStart" class="col-md-3 overflow-auto" style="font-size: 24px; min-height: 100px; max-height: 400px;">
                     <div v-for="(choice_set, index) in exam.section[current_section].question[current].choice_set" :key="index" class="row border border-dark mb-2 pb-2">
                         <div class="col-md-12 font-weight-bold">
                             {{ choice_set.description }}
@@ -141,13 +143,24 @@
 
             </b-form>
         </b-modal>
+
+        <b-modal centered
+            id="loading-modal"
+            ref="loading-modal"
+            title="Loading Assets... Please Wait "
+            hide-footer
+            @ok="startExam">
+            <b-progress :max="totalAssets" animated>
+                <b-progress-bar :value="assetsLoaded" :label="`${Math.round((assetsLoaded/totalAssets) * 100)}%`"></b-progress-bar>
+            </b-progress>
+        </b-modal>
     </div>
 </template>
 
 <script>
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
-var audio
+var audio;
 
 export default {
     name: 'exam',
@@ -167,6 +180,10 @@ export default {
             submitDisabled: false,
             current_section: 0,
             current: 0,
+            totalAssets: 0,
+            assetsLoaded: 0,
+            allLoaded: false,
+            examStart: false,
             exam: null,
         }
     },
@@ -193,6 +210,27 @@ export default {
             .then(({data}) => {
                 if(data !== 'wrong'){
                     this.max = data.section.length * 100;
+
+                    for(let x = 0; x < data.section.length; x++){
+                        for(let y = 0; y < data.section[x].question.length; y++){
+                            this.totalAssets++;
+                            
+                            if(data.section[x].question[y].audio){
+                                this.totalAssets++;
+                            }
+
+                            for(let z = 0; z < data.section[x].question[y].choice_set.length; z++){
+
+                                if(data.section[x].question[y].choice_type === '1'){
+                                    for(let i = 0; i < data.section[x].question[y].choice_set[z].choices.length; i++){
+                                        this.totalAssets++;
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+
                     for(let x = 0; x < data.section.length; x++){
 
                         this.progress.push({bar: 0, max: data.section[x].question.length});
@@ -201,12 +239,21 @@ export default {
                         for(let y = 0; y < data.section[x].question.length; y++){
 
                             const preload_image = new Image();
+
                             preload_image.src = this.$URL+'/img/question/'+data.section[x].question[y].picture;
+
+                            preload_image.onload = () => {
+                                this.assetsLoaded++;
+                            }
 
                             if(data.section[x].question[y].audio){
                                 const preload_audio = new Audio();
                                 preload_audio.src = this.$URL+'/audio/'+data.section[x].question[y].audio;
                                 data.section[x].question[y].audio_counter = 2;
+                                
+                                preload_audio.addEventListener('canplaythrough', () => {
+                                    this.assetsLoaded++;
+                                })
                             }
 
                             for(let z = 0; z < data.section[x].question[y].choice_set.length; z++){
@@ -215,6 +262,10 @@ export default {
                                     for(let i = 0; i < data.section[x].question[y].choice_set[z].choices.length; i++){
                                         const preload_choice = new Image();
                                         preload_choice.src = this.$URL+'/img/choices/'+data.section[x].question[y].choice_set[z].choices[i].choices;
+                                        
+                                        preload_choice.onload = () => {
+                                            this.assetsLoaded++;
+                                        }
                                     }
                                 }
 
@@ -226,12 +277,7 @@ export default {
                     this.exam = data;
 
                     this.$refs['password-modal'].hide();
-                
-                    /*window.addEventListener('keydown', (e) => {
-                        if(e.key == 'Enter'){
-                            this.nextQuestion();
-                        }
-                    });*/
+                    this.$refs['loading-modal'].show();
                 }else{
                     this.$Toast.fire({
                         icon: 'warning',
@@ -423,6 +469,31 @@ export default {
             return '';
         },
     },
+    watch: {
+        assetsLoaded: function(val){
+            if(this.totalAssets == val){
+                this.allLoaded = true;
+            }
+        },
+        allLoaded: function(val){
+            if(val == true){
+                setTimeout(() => {
+                    this.$refs['loading-modal'].hide();
+                    
+                    this.$Swal.fire({
+                        icon: 'success',
+                        title: 'Great!',
+                        text: 'Exam will now start',
+                        showConfirmButton: false,
+                        timer: 2500,
+                        onClose: () => {
+                            this.examStart = true;
+                        }
+                    })
+                }, 1500);
+            }
+        }
+    },
     created() {
     },
     mounted() {
@@ -438,5 +509,12 @@ export default {
     }
     .clickable {
         cursor: pointer;
+    }
+    .tempImage{
+        display: inline-block;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain;
+        height: 500px;
     }
 </style>
