@@ -156,6 +156,7 @@
 </template>
 
 <script>
+import { isIOS } from 'mobile-device-detect';
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
 var audio;
@@ -184,7 +185,8 @@ export default {
             examStart: false,
             exam: null,
             submitInfo: false,
-            timeSpent: [0, 0, 0, 0]
+            timeSpent: [0, 0, 0, 0],
+            iOS: isIOS ? true : false
         }
     },
     methods: {
@@ -216,7 +218,7 @@ export default {
                         for(let y = 0; y < data.section[x].question.length; y++){
                             this.totalAssets++;
                             
-                            if(data.section[x].question[y].audio){
+                            if(data.section[x].question[y].audio && !this.iOS){
                                 this.totalAssets++;
                             }
 
@@ -252,9 +254,11 @@ export default {
                                 preload_audio.src = this.$URL+'/audio/'+data.section[x].question[y].audio;
                                 data.section[x].question[y].audio_counter = 2;
                                 
-                                preload_audio.addEventListener('canplaythrough', () => {
-                                    this.assetsLoaded++;
-                                })
+                                if(!this.iOS){
+                                    preload_audio.addEventListener('canplaythrough', () => {
+                                        this.assetsLoaded++;
+                                    })
+                                }
                             }
 
                             for(let z = 0; z < data.section[x].question[y].choice_set.length; z++){
@@ -547,6 +551,7 @@ export default {
     created() {
     },
     mounted() {
+        console.log(this.iOS);
         this.initExam();
     }
 }

@@ -17,6 +17,7 @@
     "core-js": "^3.3.2",
     "jspdf": "^1.5.3",
     "jspdf-autotable": "^3.2.11",
+    "mobile-device-detect": "^0.3.3",
     "pretty-checkbox": "^3.0.3",
     "roboto-fontface": "^0.10.0",
     "sweetalert2": "^9.3.11",
