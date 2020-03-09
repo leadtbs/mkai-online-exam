@@ -105,6 +105,21 @@
             <b-form @submit.prevent="startExam">
 
                 <b-form-group>
+                    <div class="camera" v-show="!picTaken">
+                        <video autoplay id="feed"></video>
+                    </div>
+                    
+                    <div class="picture" v-show="picTaken">
+                        <canvas id="canvas"></canvas>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="button" class="btn btn-success mt-1" @click="takePicture">Take Photo</button>
+                    </div>
+                    
+                </b-form-group>
+
+                <b-form-group>
                     <b-form-input
                         autocomplete="off" 
                         type="text"
@@ -159,7 +174,7 @@
 import { isIOS } from 'mobile-device-detect';
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
-var audio;
+var audio
 
 export default {
     name: 'exam',
@@ -186,7 +201,9 @@ export default {
             exam: null,
             submitInfo: false,
             timeSpent: [0, 0, 0, 0],
-            iOS: isIOS ? true : false
+            iOS: isIOS ? true : false,
+            picture: null,
+            picTaken: false,
         }
     },
     methods: {
@@ -203,6 +220,51 @@ export default {
         },
         initExam(){
             this.$refs['password-modal'].show();
+            this.initCamera();
+        },
+        initCamera(){
+            if('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices){
+                
+                    let constraints = {
+                        video: {
+                            width: {
+                                min: 640,
+                                ideal: 768,
+                                //max: 1920
+                            },
+                            height: {
+                                min: 360,
+                                ideal: 480,
+                                //max: 1080
+                            }
+                        }
+                    }
+
+                    navigator.mediaDevices.getUserMedia(constraints).then(stream => {
+                    
+                    const videoPlayer = document.querySelector('video');
+                    videoPlayer.srcObject = stream;
+                    videoPlayer.play;
+                });
+            }
+            else {
+                this.$Toast.fire({
+                    icon: 'warning',
+                    title: 'No Media Devices'
+                });
+            }
+        },
+        takePicture(){
+            let ratio = (window.innerHeight < window.innerWidth) ? 16/9 : 9/16;
+            const picture = document.getElementById('canvas');
+            picture.width = (window.innerWidth < 1200) ? window.innerWidth : 1280;
+            picture.height = window.innerWidth / ratio;
+            const ctx = picture.getContext('2d');
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(document.getElementById('feed'), 0, 0, picture.width, picture.height);
+            this.picture = picture.toDataURL();
+            this.picTaken = true;
         },
         startExam(){
             this.submitInfo = true;
@@ -463,6 +525,10 @@ export default {
                 doc.text('Set Name: ' + data.set_name, 40, 30)
                 doc.text('Student Name: ' + data.stud_name, 40, 50)
                 doc.text(40, 70, 'Sensei: ' + data.stud_sensei)
+
+                if(this.picTaken){
+                    doc.addImage(this.picture, 'JPEG', 400, 15, 150, 85);
+                }
                 
                 let d = new Date();
                 let date = d.getMonth() + '/' + d.getDay() + '/' + d.getFullYear();
@@ -478,7 +544,7 @@ export default {
                 doc.autoTable({
                     head: [columns],
                     body: rows,
-                    margin: {top:100}
+                    margin: {top:120}
                 })
                 
                 doc.save(data.set_name + ' - ' + data.stud_name + ' Result.pdf');
@@ -551,7 +617,6 @@ export default {
     created() {
     },
     mounted() {
-        console.log(this.iOS);
         this.initExam();
     }
 }
@@ -571,5 +636,24 @@ export default {
         background-repeat: no-repeat;
         background-size: contain;
         height: 500px;
+    }
+    .camera {
+        width: 80%;
+        max-height: 500px;
+        margin: 0 auto;
+    }
+    #feed, .picture{
+        display: block;
+        width: 80%;
+        max-height: 300px;
+        margin: 0 auto;
+        background-color: #171717;
+        box-shadow: 5px 5px 12px 0px rgba(0,0,0, 0.25);
+    }
+    #canvas{
+        display: block;
+        width: 100%;
+        max-height: 300px;
+        margin: 0 auto;
     }
 </style>
