@@ -184,35 +184,35 @@
 import { isIOS } from 'mobile-device-detect';
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
-var audio
+var audio, interval
 
 export default {
     name: 'exam',
     data() {
         return {
             form: {
-                name: (localStorage.getItem('name')) ? JSON.parse(localStorage.getItem('name')) : '',
-                sensei: (localStorage.getItem('sensei')) ? JSON.parse(localStorage.getItem('sensei')) : '',
+                name: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('name')) : '',
+                sensei: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('sensei')) : '',
                 password: ''
             },
             variant: ['info', 'danger', 'primary', 'success'],
-            max: (localStorage.getItem('max')) ? JSON.parse(localStorage.getItem('max')) : 0,
-            progress: (localStorage.getItem('progress')) ? JSON.parse(localStorage.getItem('progress')) : [],
+            max: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('max')) : 0,
+            progress: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('progress')) : [],
             playing: false,
-            submit: (localStorage.getItem('submit')) ? JSON.parse(localStorage.getItem('submit')) : false,
+            submit: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('submit')) : false,
             submitDisabled: false,
-            current_section: (localStorage.getItem('current_section')) ? JSON.parse(localStorage.getItem('current_section')) : 0,
-            current: (localStorage.getItem('current')) ? JSON.parse(localStorage.getItem('current')) : 0,
+            current_section: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('current_section')) : 0,
+            current: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('current')) : 0,
             totalAssets: 0,
             assetsLoaded: 0,
             allLoaded: false,
             examStart: false,
             exam: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('exam')) : null,
             submitInfo: false,
-            timeSpent: (localStorage.getItem('timeSpent')) ? JSON.parse(localStorage.getItem('timeSpent')) : [0, 0, 0, 0],
+            timeSpent: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('timeSpent')) : [{'time': 0}, {'time': 0}, {'time': 0}, {'time': 0},],
             iOS: isIOS ? true : false,
-            picture: (localStorage.getItem('picture')) ? JSON.parse(localStorage.getItem('picture')) : null,
-            picTaken: (localStorage.getItem('picTaken')) ? JSON.parse(localStorage.getItem('picTaken')) : false,
+            picture: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('picture')) : null,
+            picTaken: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('picTaken')) : false,
             mediaAvailable: ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) ? true : false,
             continueExam: false,
         }
@@ -227,7 +227,7 @@ export default {
             this.current_section = 0;
             this.current = 0;
             this.exam = null;
-            this.timeSpent = [0, 0, 0, 0];
+            this.timeSpent = [{'time': 0}, {'time': 0}, {'time': 0}, {'time': 0},];
             this.picture = null;
             this.picTaken = false;
         },
@@ -565,11 +565,11 @@ export default {
                 let timeSpentAll = 0;
 
                 for(let x = 0; x < this.timeSpent.length; x++){
-                    let h = Math.floor(this.timeSpent[x] / 3600);
-                    let m = Math.floor((this.timeSpent[x] - h*3600) / 60);
-                    let s = Math.floor((this.timeSpent[x]) - (h*3600) - (m*60));
+                    let h = Math.floor(this.timeSpent[x].time / 3600);
+                    let m = Math.floor((this.timeSpent[x].time - h*3600) / 60);
+                    let s = Math.floor((this.timeSpent[x].time) - (h*3600) - (m*60));
                     timeSpentEach[x] = h + ':' + ((m.toString().length == 1) ? '0'+m : m) + ':' + (s.toString().length == 1 ? '0'+s : s);
-                    timeSpentAll += this.timeSpent[x];
+                    timeSpentAll += this.timeSpent[x].time;
                 }
 
                 let h = Math.floor(timeSpentAll / 3600);
@@ -619,6 +619,7 @@ export default {
                 doc.save(data.set_name + ' - ' + data.stud_name + ' Result.pdf');
 
                 setTimeout(() => {
+                    clearInterval(interval);
                     localStorage.clear();
                     this.$router.push('/');
                 }, 5000)
@@ -673,11 +674,10 @@ export default {
                         showConfirmButton: false,
                         timer: 2500,
                         onClose: () => {
-                            this.examStart = true;
+                            this.examStart = true;  
                             
-                            setInterval(() => {
-                                localStorage.setItem('timeSpent', JSON.stringify(this.timeSpent));
-                                this.timeSpent[this.current_section]++;
+                            interval = setInterval(() => {
+                                this.timeSpent[this.current_section].time++;
                                 this.exam.time--;
                             }, 1000)
                         }
@@ -745,6 +745,13 @@ export default {
             immediate: true,
             handler(data) {
                 localStorage.setItem('picTaken', JSON.stringify(data));
+            },
+            deep: true
+        },
+        timeSpent: {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('timeSpent', JSON.stringify(data));
             },
             deep: true
         },

@@ -49,6 +49,7 @@ export default {
         let exam = JSON.parse(localStorage.getItem('exam'));
         let name = JSON.parse(localStorage.getItem('name'));
         if(exam){
+            console.log('mao ni');
             this.$Swal.fire({
                 title: 'Ongoing Exam ('+exam.name+')',
                 text: 'An exam taken by '+name+' is currently active, would you like to continue?',
@@ -60,7 +61,6 @@ export default {
                 allowOutsideClick: false,
             }).then((result) => {
                 if (result.value) {
-                    
                     this.$router.push('/exam/'+exam.id);
                 }
                 else{
@@ -68,6 +68,9 @@ export default {
                     this.loadSets();
                 }
             })
+        }
+        else{
+            this.loadSets();
         }
     }
 }
