@@ -104,7 +104,7 @@
             @ok="startExam">
             <b-form @submit.prevent="startExam">
 
-                <b-form-group>
+                <b-form-group v-if="mediaAvailable">
                     <div class="camera" v-show="!picTaken">
                         <video autoplay id="feed"></video>
                     </div>
@@ -117,6 +117,12 @@
                         <button type="button" class="btn btn-success mt-1" @click="takePicture">Take Photo</button>
                     </div>
                     
+                </b-form-group>
+
+                <b-form-group v-else>
+                    <div class="text-center">
+                        <h3><b-badge variant="danger">No Cameras Detected</b-badge></h3>
+                    </div>
                 </b-form-group>
 
                 <b-form-group>
@@ -204,6 +210,7 @@ export default {
             iOS: isIOS ? true : false,
             picture: null,
             picTaken: false,
+            mediaAvailable: ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) ? true : false
         }
     },
     methods: {
@@ -241,11 +248,13 @@ export default {
                     }
 
                     navigator.mediaDevices.getUserMedia(constraints).then(stream => {
-                    
-                    const videoPlayer = document.querySelector('video');
-                    videoPlayer.srcObject = stream;
-                    videoPlayer.play;
-                });
+                        this.mediaAvailable = true;
+                        const videoPlayer = document.querySelector('video');
+                        videoPlayer.srcObject = stream;
+                        videoPlayer.play;
+                    }).catch(() => {
+                        this.mediaAvailable = false;
+                    });
             }
             else {
                 this.$Toast.fire({
