@@ -47,7 +47,9 @@
                     <div class="row mt-5" v-if="exam.section[current_section].question[current].audio">
                         <div class="col-md-12 text-center" style="display: inline-block;">
 
-                            <button :disabled="playing" @click="playAudio(exam.section[current_section].question[current].audio)" class="btn btn-md btn-success"><i class="fa fa-play"></i></button>&nbsp;
+                            <button 
+                                :disabled="playing || exam.section[current_section].question[current].audio_counter < 1" 
+                                @click="playAudio(exam.section[current_section].question[current].audio)" class="btn btn-md btn-success"><i class="fa fa-play"></i></button>&nbsp;
                                 <font-awesome-icon 
                                     v-for="index in 2"
                                     :key="index"
@@ -114,7 +116,7 @@
                     </div>
                     
                     <div class="text-center">
-                        <button type="button" class="btn btn-success mt-1" @click="takePicture">Take Photo</button>
+                        <button type="button" class="btn btn-success mt-1" @click="takePicture" :disabled="continueExam">Take Photo</button>
                     </div>
                     
                 </b-form-group>
@@ -132,6 +134,7 @@
                         required
                         placeholder="Enter Your Name"
                         v-model="form.name"
+                        :disabled="continueExam"
                     >
                     </b-form-input>
                 </b-form-group>
@@ -142,6 +145,7 @@
                         placeholder="Enter Your Teacher's Name"
                         required
                         v-model="form.sensei"
+                        :disabled="continueExam"
                     >
                     </b-form-input>
                 </b-form-group>
@@ -187,33 +191,46 @@ export default {
     data() {
         return {
             form: {
-                name: '',
-                sensei: '',
+                name: (localStorage.getItem('name')) ? JSON.parse(localStorage.getItem('name')) : '',
+                sensei: (localStorage.getItem('sensei')) ? JSON.parse(localStorage.getItem('sensei')) : '',
                 password: ''
             },
             variant: ['info', 'danger', 'primary', 'success'],
-            max: 0,
-            progress: [
-            ],
+            max: (localStorage.getItem('max')) ? JSON.parse(localStorage.getItem('max')) : 0,
+            progress: (localStorage.getItem('progress')) ? JSON.parse(localStorage.getItem('progress')) : [],
             playing: false,
-            submit: false,
+            submit: (localStorage.getItem('submit')) ? JSON.parse(localStorage.getItem('submit')) : false,
             submitDisabled: false,
-            current_section: 0,
-            current: 0,
+            current_section: (localStorage.getItem('current_section')) ? JSON.parse(localStorage.getItem('current_section')) : 0,
+            current: (localStorage.getItem('current')) ? JSON.parse(localStorage.getItem('current')) : 0,
             totalAssets: 0,
             assetsLoaded: 0,
             allLoaded: false,
             examStart: false,
-            exam: null,
+            exam: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('exam')) : null,
             submitInfo: false,
-            timeSpent: [0, 0, 0, 0],
+            timeSpent: (localStorage.getItem('timeSpent')) ? JSON.parse(localStorage.getItem('timeSpent')) : [0, 0, 0, 0],
             iOS: isIOS ? true : false,
-            picture: null,
-            picTaken: false,
-            mediaAvailable: ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) ? true : false
+            picture: (localStorage.getItem('picture')) ? JSON.parse(localStorage.getItem('picture')) : null,
+            picTaken: (localStorage.getItem('picTaken')) ? JSON.parse(localStorage.getItem('picTaken')) : false,
+            mediaAvailable: ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) ? true : false,
+            continueExam: false,
         }
     },
     methods: {
+        resetData(){
+            this.form.name = '';
+            this.form.sensei = '';
+            this.max = 0;
+            this.progress = [];
+            this.submit = false;
+            this.current_section = 0;
+            this.current = 0;
+            this.exam = null;
+            this.timeSpent = [0, 0, 0, 0];
+            this.picture = null;
+            this.picTaken = false;
+        },
         pick(choice_set_index, choice_index){
             this.exam.section[this.current_section].question[this.current].choice_set[choice_set_index].picked = choice_index;
         },
@@ -282,9 +299,8 @@ export default {
                 id: this.$route.params.set_id
             })
             .then(({data}) => {
+                this.form.password = '';
                 if(data !== 'wrong'){
-                    this.max = data.section.length * 100;
-
                     for(let x = 0; x < data.section.length; x++){
                         for(let y = 0; y < data.section[x].question.length; y++){
                             this.totalAssets++;
@@ -305,61 +321,104 @@ export default {
                         }
                     }
 
-                    for(let x = 0; x < data.section.length; x++){
+                    if(this.continueExam){
+                        for(let x = 0; x < this.exam.section.length; x++){
+                            for(let y = 0; y < this.exam.section[x].question.length; y++){
+                                const preload_image = new Image();
 
-                        this.progress.push({bar: 0, max: data.section[x].question.length});
-                        data.section[x].question = this.shuffle(data.section[x].question);
+                                preload_image.src = this.$URL+'/img/question/'+data.section[x].question[y].picture;
 
-                        for(let y = 0; y < data.section[x].question.length; y++){
-
-                            const preload_image = new Image();
-
-                            preload_image.src = this.$URL+'/img/question/'+data.section[x].question[y].picture;
-
-                            preload_image.onload = () => {
-                                this.assetsLoaded++;
-                            }
-
-                            if(data.section[x].question[y].audio){
-                                const preload_audio = new Audio();
-                                preload_audio.src = this.$URL+'/audio/'+data.section[x].question[y].audio;
-                                data.section[x].question[y].audio_counter = 2;
-                                
-                                if(!this.iOS){
-                                    preload_audio.addEventListener('canplaythrough', () => {
-                                        this.assetsLoaded++;
-                                    })
+                                preload_image.onload = () => {
+                                    this.assetsLoaded++;
                                 }
-                            }
 
-                            for(let z = 0; z < data.section[x].question[y].choice_set.length; z++){
-
-                                if(data.section[x].question[y].choice_type === '1'){
-                                    for(let i = 0; i < data.section[x].question[y].choice_set[z].choices.length; i++){
-                                        const preload_choice = new Image();
-                                        preload_choice.src = this.$URL+'/img/choices/'+data.section[x].question[y].choice_set[z].choices[i].choices;
-                                        
-                                        preload_choice.onload = () => {
+                                if(this.exam.section[x].question[y].audio){
+                                    const preload_audio = new Audio();
+                                    preload_audio.src = this.$URL+'/audio/'+this.exam.section[x].question[y].audio;
+                                    
+                                    if(!this.iOS){
+                                        preload_audio.addEventListener('canplaythrough', () => {
                                             this.assetsLoaded++;
-                                        }
+                                        })
                                     }
                                 }
 
-                                data.section[x].question[y].choice_set[z].picked = null;
-                                data.section[x].question[y].choice_set[z].choices = this.shuffle(data.section[x].question[y].choice_set[z].choices);
+                                for(let z = 0; z < this.exam.section[x].question[y].choice_set.length; z++){
+
+                                    if(this.exam.section[x].question[y].choice_type === '1'){
+                                        for(let i = 0; i < this.exam.section[x].question[y].choice_set[z].choices.length; i++){
+                                            const preload_choice = new Image();
+                                            preload_choice.src = this.$URL+'/img/choices/'+this.exam.section[x].question[y].choice_set[z].choices[i].choices;
+                                            
+                                            preload_choice.onload = () => {
+                                                this.assetsLoaded++;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
+                    }
+                    else{
+                        this.max = data.section.length * 100;
+
+                        for(let x = 0; x < data.section.length; x++){
+
+                            this.progress.push({bar: 0, max: data.section[x].question.length});
+                            data.section[x].question = this.shuffle(data.section[x].question);
+
+                            for(let y = 0; y < data.section[x].question.length; y++){
+
+                                const preload_image = new Image();
+
+                                preload_image.src = this.$URL+'/img/question/'+data.section[x].question[y].picture;
+
+                                preload_image.onload = () => {
+                                    this.assetsLoaded++;
+                                }
+
+                                if(data.section[x].question[y].audio){
+                                    const preload_audio = new Audio();
+                                    preload_audio.src = this.$URL+'/audio/'+data.section[x].question[y].audio;
+                                    data.section[x].question[y].audio_counter = 2;
+                                    
+                                    if(!this.iOS){
+                                        preload_audio.addEventListener('canplaythrough', () => {
+                                            this.assetsLoaded++;
+                                        })
+                                    }
+                                }
+
+                                for(let z = 0; z < data.section[x].question[y].choice_set.length; z++){
+
+                                    if(data.section[x].question[y].choice_type === '1'){
+                                        for(let i = 0; i < data.section[x].question[y].choice_set[z].choices.length; i++){
+                                            const preload_choice = new Image();
+                                            preload_choice.src = this.$URL+'/img/choices/'+data.section[x].question[y].choice_set[z].choices[i].choices;
+                                            
+                                            preload_choice.onload = () => {
+                                                this.assetsLoaded++;
+                                            }
+                                        }
+                                    }
+
+                                    data.section[x].question[y].choice_set[z].picked = null;
+                                    data.section[x].question[y].choice_set[z].choices = this.shuffle(data.section[x].question[y].choice_set[z].choices);
+                                }
+                            }
+
+                            this.exam = data;
+                        }
+
                     }
 
                     this.$refs['password-modal'].hide();
                     this.$refs['loading-modal'].show();
-                    this.exam = data;
                 }else{
                     this.$Toast.fire({
                         icon: 'warning',
                         title: 'Wrong Password, Try Again'
                     });
-                    this.form.password = '';
                     this.initExam();
                     this.submitInfo = false;
                 }
@@ -438,10 +497,11 @@ export default {
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Proceed'
+                confirmButtonText: 'Proceed',
+                allowOutsideClick: false,
             }).then((result) => {
                 if (result.value) {
-                    this.resetAudio()
+                    this.resetAudio();
                     this.current = 0;
                     this.current_section++
                     if(this.current_section == this.exam.section.length-1){
@@ -559,6 +619,7 @@ export default {
                 doc.save(data.set_name + ' - ' + data.stud_name + ' Result.pdf');
 
                 setTimeout(() => {
+                    localStorage.clear();
                     this.$router.push('/');
                 }, 5000)
             })
@@ -615,18 +676,115 @@ export default {
                             this.examStart = true;
                             
                             setInterval(() => {
+                                localStorage.setItem('timeSpent', JSON.stringify(this.timeSpent));
                                 this.timeSpent[this.current_section]++;
+                                this.exam.time--;
                             }, 1000)
                         }
                     })
                 }, 1500);
             }
         },
+        'form.name': {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('name', JSON.stringify(data));
+            },
+            deep: true
+        },
+        'form.sensei': {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('sensei', JSON.stringify(data));
+            },
+            deep: true
+        },
+        max: {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('max', JSON.stringify(data))
+            },
+            deep: true
+        },
+        progress: {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('progress', JSON.stringify(data))
+            },
+            deep: true
+        },
+        submit: {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('submit', JSON.stringify(data));
+            },
+            deep: true
+        },
+        current_section: {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('current_section', JSON.stringify(data));
+            },
+            deep: true
+        },
+        current: {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('current', JSON.stringify(data));
+            },
+            deep: true
+        },
+        picture: {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('picture', JSON.stringify(data));
+            },
+            deep: true
+        },
+        picTaken: {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('picTaken', JSON.stringify(data));
+            },
+            deep: true
+        },
+        exam: {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('exam', JSON.stringify(data));
+            },
+            deep: true
+        },
+
     },
     created() {
     },
     mounted() {
-        this.initExam();
+        if(this.exam){
+            this.$Swal.fire({
+                title: 'Ongoing Exam',
+                text: "An exam is currently active, would you like to continue?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Proceed',
+                allowOutsideClick: false,
+            }).then((result) => {
+                if (result.value) {
+                    this.continueExam = true;
+                    this.initExam();
+                }
+                else{
+                    localStorage.clear();
+                    this.resetData();
+                    this.initExam();
+                }
+            })
+        }
+        else{
+            this.initExam();
+        }
     }
 }
 </script>
