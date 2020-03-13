@@ -151,6 +151,17 @@
                 </b-form-group>
 
                 <b-form-group>
+                    <b-form-datepicker
+                        v-model="form.start"
+                        :disabled="continueExam"
+                        required
+                        placeholder="Enter Start of Class"
+                    >
+
+                    </b-form-datepicker>
+                </b-form-group>
+
+                <b-form-group>
                     <b-form-input
                         autocomplete="off" 
                         type="password"
@@ -193,6 +204,7 @@ export default {
             form: {
                 name: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('name')) : '',
                 sensei: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('sensei')) : '',
+                start: (localStorage.getItem('start')) ? JSON.parse(localStorage.getItem('start')) : '',
                 password: ''
             },
             variant: ['info', 'danger', 'primary', 'success'],
@@ -600,7 +612,7 @@ export default {
                 }
                 
                 let d = new Date();
-                let date = d.getMonth() + '/' + d.getDay() + '/' + d.getFullYear();
+                let date = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
                 let minutes = d.getMinutes();
                 if(minutes.toString().length == 1){
                     minutes = '0' + minutes;
@@ -608,12 +620,13 @@ export default {
 
                 let time = d.getHours() + ':' + minutes;
 
-                doc.text('Date & Time: ' + date + ' ' + time, 40, 90)
+                doc.text('Start of Class: ' + this.form.start, 40, 90)
+                doc.text('Date & Time: ' + date + ' ' + time, 40, 110)
 
                 doc.autoTable({
                     head: [columns],
                     body: rows,
-                    margin: {top:120}
+                    margin: {top:130}
                 })
                 
                 doc.save(data.set_name + ' - ' + data.stud_name + ' Result.pdf');
@@ -696,6 +709,13 @@ export default {
             immediate: true,
             handler(data) {
                 localStorage.setItem('sensei', JSON.stringify(data));
+            },
+            deep: true
+        },
+        'form.start': {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('start', JSON.stringify(data));
             },
             deep: true
         },
