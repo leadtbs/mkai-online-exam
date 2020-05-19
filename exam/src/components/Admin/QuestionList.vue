@@ -5,7 +5,8 @@
                 <table class="text-center table-bordered m-auto" style="width: 95%">
                     <tr>
                         <td style="height: 100px;" colspan="3" class="align-middle font-weight-bold">
-                            <img :src="$URL+'/img/question/'+question.picture" alt="Question" style="width: 100%;">
+                            <img v-if="set_type==1" :src="$URL+'/img/question/'+question.picture" alt="Question" style="width: 100%;">
+                            <img v-else :src="$URL+'/img/ncquestion/'+question.picture" alt="Question" style="width: 100%;">
                         </td>
                     </tr>
                     <tr>
@@ -26,7 +27,7 @@
 <script>
 export default {
     props: [
-        'set_id', 'tab_index'
+        'set_id', 'tab_index', 'set_type'
     ],
     data() {
         return {
@@ -49,7 +50,11 @@ export default {
             }).then((result) => {
                 if(result.value){
                     this.$Progress.start();
-                    this.$axios.delete('api/delete-question/'+question_id)
+                    this.$axios.delete('api/delete-question/'+question_id, {
+                        params: {
+                            set_type: this.$route.params.set_type
+                        }
+                    })
                     .then(() => {
                         this.loadQuestion();
                     })
@@ -60,7 +65,11 @@ export default {
             })
         },
         loadQuestion(){
-            this.$axios.get('api/questions/'+this.set_id+'/tab/'+this.tab_index)
+            this.$axios.get('api/questions/'+this.set_id+'/tab/'+this.tab_index, {
+                params: {
+                    set_type: this.$route.params.set_type
+                }
+            })
             .then(({data}) => {
                 this.questions = data;
                 this.$Progress.finish();

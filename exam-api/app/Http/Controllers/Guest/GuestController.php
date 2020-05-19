@@ -96,21 +96,41 @@ class GuestController extends Controller
         ];
     }
     
-    public function getSetAll(){
-        $temp = Set::with('question.choice_set.choices')->get();
-        $set = Set::all();
+    public function getSetAll(Request $request){
+        $set_type = $request->set_type;
+        $temp = Set::with('question.choice_set.choices')->where('set_type_id', 1)->get();
+        if($set_type != 1){
+            $tempNC = Set::with('nc_question.choice_set.choices')->where('set_type_id', $set_type)->get();
+        }
+        $set = Set::where('set_type_id', $set_type)->get();
         
-        for($x = 0; $x < count($set); $x++){
-            $set[$x]['question_count'] = $temp[$x]['question']->count();
-            $choice_count = 0;
-            if(!($temp[$x]['question']->isEmpty())){
-                foreach($temp[$x]['question'] as $q){
-                    foreach($q->choice_set as $cs){
-                        $choice_count++;
+        if($set_type == 1){
+            for($x = 0; $x < count($set); $x++){
+                $set[$x]['question_count'] = $temp[$x]['question']->count();
+                $choice_count = 0;
+                if(!($temp[$x]['question']->isEmpty())){
+                    foreach($temp[$x]['question'] as $q){
+                        foreach($q->choice_set as $cs){
+                            $choice_count++;
+                        }
                     }
                 }
+                $set[$x]['choice_count'] = $choice_count;
             }
-            $set[$x]['choice_count'] = $choice_count;
+        }else{
+            info('diri nisulod');
+            for($x = 0; $x < count($set); $x++){
+                $set[$x]['question_count'] = $tempNC[$x]['nc_question']->count();
+                $choice_count = 0;
+                if(!($tempNC[$x]['nc_question']->isEmpty())){
+                    foreach($tempNC[$x]['nc_question'] as $q){
+                        foreach($q->choice_set as $cs){
+                            $choice_count++;
+                        }
+                    }
+                }
+                $set[$x]['choice_count'] = $choice_count;
+            }
         }
 
         return $set;

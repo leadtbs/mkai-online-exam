@@ -10,7 +10,7 @@
                 <div class="row">
                     <!-- LEFT -->
                     <div class="col-md-5">
-                        <div class="custom-file col-md-12 mb-3">
+                        <div class="custom-file col-md-12 mb-3" v-if="ifJLT">
                             <div class="row mb-2">
                                 <div class="col-md-10">
                                     <input type="file" class="custom-file-input" @change="audioFileChange($event)">
@@ -128,7 +128,8 @@ export default {
             playing: false,
             audioName: '',
             imgName: '',
-            img: ''
+            img: '',
+            ifJLT: (this.$route.params.set_type == 'jlt') ? true : false
         }
     },
     methods: {
@@ -158,6 +159,9 @@ export default {
             this.$axios.post('api/update-question', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
+                },
+                params: {
+                    set_type: this.$route.params.set_type
                 }
             })
             .then(() => {
@@ -211,11 +215,16 @@ export default {
             if(this.question.choice_set[index].choices[choice_index].choice_url){
                 return this.question.choice_set[index].choices[choice_index].choices;
             }else{
-                return this.$URL+'/img/choices/'+this.question.choice_set[index].choices[choice_index].choices;
+                let c = (this.ifJLT) ? 'choices' : 'ncchoices';
+                return this.$URL+'/img/'+c+'/'+this.question.choice_set[index].choices[choice_index].choices;
             }
         },
         initQuestion(){
-            this.$axios.get('api/get-questions-and-choices/'+this.$route.params.question_id)
+            this.$axios.get('api/get-questions-and-choices/'+this.$route.params.question_id, {
+                params: {
+                    set_type: this.$route.params.set_type
+                }
+            })
             .then(({data}) => {
                 this.question = data;
                 this.question.img_url = '';
@@ -229,7 +238,8 @@ export default {
     },
     computed: {
         showImage: function () {
-            return (this.img) ? this.img : this.$URL+'/img/question/'+this.question.picture;
+            let q = (this.ifJLT) ? 'question' : 'ncquestion';
+            return (this.img) ? this.img : this.$URL+'/img/'+q+'/'+this.question.picture;
         }
     },
     created() {
