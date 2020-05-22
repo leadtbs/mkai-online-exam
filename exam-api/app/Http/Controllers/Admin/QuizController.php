@@ -164,14 +164,14 @@ class QuizController extends Controller
         $isJLT = ($request->set_type == 'jlt') ? true : false;
         $decoded = json_decode($request->data, true);
         
-        $question = Question::find($decoded['id']);
+        $question = ($isJLT) ? Question::find($decoded['id']) : NCQuestion::find($decoded['id']);
 
         if($request->hasFile('image')){
             $q = ($isJLT) ? 'question' : 'ncquestion';
             $fileextension = $request->image->getClientOriginalExtension();
             $filename = (sha1(time().$request->image->getClientOriginalName())).'.'.$fileextension;
-            $request->image->move(public_path('img/'+$q), $filename);
-            $image_path = public_path().'/img\/'+$q+'/'.$question->picture;
+            $request->image->move(public_path('img/'.$q), $filename);
+            $image_path = public_path().'/img\/'.$q.'/'.$question->picture;
             File::delete($image_path);
             $question->picture = $filename;
         }
