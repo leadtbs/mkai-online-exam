@@ -321,11 +321,17 @@ export default {
             this.$axios.post('/api/confirm-password', {
                 form: this.form,
                 id: this.$route.params.set_id,
-                set_type: this.$route.params.set_type
+                set_type: this.set_type
             })
             .then(({data}) => {
                 this.form.password = '';
                 if(data !== 'wrong'){
+                    const video = document.querySelector('video');
+                    const mediaStream = video.srcObject;
+                    const tracks = mediaStream.getTracks();
+                    tracks[0].stop();
+                    tracks.forEach(track => track.stop());
+                    
                     for(let x = 0; x < data.section.length; x++){
                         for(let y = 0; y < data.section[x].question.length; y++){
                             this.totalAssets++;
@@ -786,6 +792,13 @@ export default {
             },
             deep: true
         },
+        set_type: {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('set_type', JSON.stringify(data));
+            },
+            deep: true
+        },
         exam: {
             immediate: true,
             handler(data) {
@@ -793,7 +806,6 @@ export default {
             },
             deep: true
         },
-
     },
     created() {
     },

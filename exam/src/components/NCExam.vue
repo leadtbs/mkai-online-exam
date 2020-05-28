@@ -178,32 +178,32 @@ import 'jspdf-autotable'
 var interval
 
 export default {
-    name: 'jlt_exam',
+    name: 'nc_exam',
     data() {
         return {
             // BOTH -- START
             form: {
-                name: '',
-                sensei: '',
-                start: '',
+                name: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('name')) : '',
+                sensei: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('sensei')) : '',
+                start: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('start')) : '',
                 password: ''
             },
-            max: 0,
-            bar: 0,
-            set_type: this.$route.params.set_type,
-            submit: false,
+            max: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('max')) : 0,
+            bar: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('bar')) : 0,
+            set_type: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('set_type')) : this.$route.params.set_type,
+            submit: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('submit')) : false,
             submitDisabled: false,
             totalAssets: 0,
             assetsLoaded: 0,
             allLoaded: false,
             examStart: false,
             submitInfo: false,
-            picture: null,
-            picTaken: false,
+            picture: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('picture')) : null,
+            picTaken: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('picTaken')) : false,
             mediaAvailable: ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) ? true : false,
             continueExam: false,
-            exam: null,
-            current: 0,
+            exam: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('exam')) : null,
+            current: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('current')) : 0,
         }
     },
     methods: {
@@ -251,7 +251,6 @@ export default {
             return finalArray;
         },
         shuffle(array){
-            console.log(array);
             for(let i = array.length - 1; i > 0; i--){
                 const j = Math.floor(Math.random() * (i + 1));
                 [array[i], array[j]] = [array[j], array[i]];
@@ -307,18 +306,23 @@ export default {
             ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(document.getElementById('feed'), 0, 0, picture.width, picture.height);
             this.picture = picture.toDataURL();
-            this.picTaken = true;
+            this.picTaken = true;            
         },
         startExam(){
             this.submitInfo = true;
             this.$axios.post('/api/confirm-password', {
                 form: this.form,
                 id: this.$route.params.set_id,
-                set_type: this.$route.params.set_type
+                set_type: this.set_type
             })
             .then(({data}) => {
                 this.form.password = '';
                 if(data !== 'wrong'){
+                    const video = document.querySelector('video');
+                    const mediaStream = video.srcObject;
+                    const tracks = mediaStream.getTracks();
+                    tracks[0].stop();
+                    tracks.forEach(track => track.stop());
 
                     for(let x = 0; x < data.question.length; x++){
                         this.totalAssets++;
@@ -333,7 +337,29 @@ export default {
                     }
                     
                     if(this.continueExam){
-                        console.log('mao ni');
+                        for(let x = 0; x < data.question.length; x++){
+                            const preload_image = new Image();
+
+                            preload_image.src = this.$URL+'/img/ncquestion/'+data.question[x].picture;
+
+                            preload_image.onload = () => {
+                                this.assetsLoaded++;
+                            }
+
+                            for(let y = 0; y < data.question[x].choice_set.length; y++){
+
+                                if(data.question[x].choice_type === '1'){
+                                    for(let z = 0; z < data.question[x].choice_set[y].choices.length; z++){
+                                        const preload_choice = new Image();
+                                        preload_choice.src = this.$URL+'/img/ncchoices/'+data.question[x].choice_set[y].choices[z].choices;
+                                        
+                                        preload_choice.onload = () => {
+                                            this.assetsLoaded++;
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }else{
                         
                         this.max = data.question.length;
@@ -453,7 +479,7 @@ export default {
         submitExam(){
             this.submitDisabled = true;
             this.$axios.post('/api/submit_nc_exam', {
-                set_type: this.$route.params.set_type,
+                set_type: this.set_type,
                 exam: this.exam
             })
             .then(({data}) => {
@@ -572,7 +598,48 @@ export default {
             },
             deep: true
         },
-
+        max: {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('max', JSON.stringify(data))
+            },
+            deep: true
+        },
+        bar: {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('bar', JSON.stringify(data))
+            },
+            deep: true
+        },
+        set_type: {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('set_type', JSON.stringify(data))
+            },
+            deep: true
+        },
+        submit: {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('submit', JSON.stringify(data));
+            },
+            deep: true
+        },
+        current: {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('current', JSON.stringify(data));
+            },
+            deep: true
+        },
+        exam: {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('exam', JSON.stringify(data));
+            },
+            deep: true
+        },
     },
     created() {
     },

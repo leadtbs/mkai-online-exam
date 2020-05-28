@@ -60,6 +60,7 @@ export default {
         }
         let exam = JSON.parse(localStorage.getItem('exam'));
         let name = JSON.parse(localStorage.getItem('name'));
+        let set_type_url = JSON.parse(localStorage.getItem('set_type'));
         if(exam){
             this.$Swal.fire({
                 title: 'Ongoing Exam ('+exam.name+')',
@@ -72,7 +73,7 @@ export default {
                 allowOutsideClick: false,
             }).then((result) => {
                 if (result.value) {
-                    this.$router.push({name: 'exam', params: {set_type: this.set_type_name, set_id: exam.id}});
+                    this.$router.push({name: 'exam', params: {set_type: set_type_url, set_id: exam.id}});
                 }
                 else{
                     localStorage.clear();
