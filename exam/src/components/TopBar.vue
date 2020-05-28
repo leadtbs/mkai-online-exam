@@ -44,14 +44,25 @@
             '$route': {
                 immediate: true,
                 handler(to) {
-                    if(to.name == "mainmenu"){
+                    if(to.name == 'mainmenu'){
                         this.headTitle = 'MKAI Computer Based Test'
-                    }
-                    else if(to.name == "jlt_home" || to.name == 'jlt_exam'){
-                        this.headTitle = 'MKAI CBT - Japanese Language Test'
                     }
                     else if(to.matched[0].name == 'admin' || to.matched[0].name == 'main_admin'){
                         this.headTitle = 'MKAI CBT - Admin'
+                    }
+                }
+            },
+            '$route.params.set_type': {
+                immediate: true,
+                handler(name) {
+                    if(name == 'jlt'){
+                        this.headTitle = 'MKAI CBT - Japanese Language Test'
+                    }
+                    else if(name == 'nce'){
+                        this.headTitle = 'MKAI CBT - Nursing Care (English)'
+                    }
+                    else if(name == 'ncj'){
+                        this.headTitle = 'MKAI CBT - Nursing Care (Japanese)'
                     }
                 }
             }

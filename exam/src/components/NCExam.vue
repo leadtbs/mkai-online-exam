@@ -318,11 +318,13 @@ export default {
             .then(({data}) => {
                 this.form.password = '';
                 if(data !== 'wrong'){
-                    const video = document.querySelector('video');
-                    const mediaStream = video.srcObject;
-                    const tracks = mediaStream.getTracks();
-                    tracks[0].stop();
-                    tracks.forEach(track => track.stop());
+                    if(this.mediaAvailable){
+                        const video = document.querySelector('video');
+                        const mediaStream = video.srcObject;
+                        const tracks = mediaStream.getTracks();
+                        tracks[0].stop();
+                        tracks.forEach(track => track.stop());
+                    }
 
                     for(let x = 0; x < data.question.length; x++){
                         this.totalAssets++;
