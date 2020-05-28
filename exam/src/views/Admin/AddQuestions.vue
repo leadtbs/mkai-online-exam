@@ -5,6 +5,7 @@
             v-on:triggerChoiceTypeChange="choiceTypeChange"
             v-on:triggerAddChoiceForm="addChoiceForm"
             addCounter="add"
+            :ifJLT="ifJLT"
         />
 
         <div class="card-body" style="min-height: 400px;">
@@ -12,7 +13,7 @@
                 <div class="row">
                     <!-- LEFT -->
                     <div class="col-md-5">
-                        <div class="custom-file col-md-12 mb-1">
+                        <div class="custom-file col-md-12 mb-1" v-if="ifJLT">
                             <input type="file" class="custom-file-input" @change="audioFileChange($event)">
                             <label class="custom-file-label" for="customFile">{{ audioName }}</label>
                         </div>
@@ -124,7 +125,8 @@ export default {
                 section_id: parseInt(this.$route.params.tab_index),
                 choice_type: false,
                 forms: []
-            }
+            },
+            ifJLT: (this.$route.params.set_type == 'jlt') ? true : false
         }
     },
     methods: {
@@ -148,6 +150,7 @@ export default {
             let formData = new FormData();
             formData.append('image', this.img_url);
             formData.append('audio', this.audio_url);
+            formData.append('set_type', this.$route.params.set_type);
             if(this.upload.choice_type == true){
                 for(let x = 0; x < this.upload.forms.length; x++){
                     for(let y = 0; y < this.upload.forms[x].choices.length; y++){
@@ -161,6 +164,11 @@ export default {
             this.$axios.post('api/submit', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
+                },
+                params: {
+                    params: {
+                        set_type: this.$route.params.set_type
+                    }
                 }
             })
             .then(() => {

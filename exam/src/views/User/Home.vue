@@ -24,16 +24,22 @@ export default {
     name: 'home',
     data() {
         return {
-            sets: {}
+            sets: {},
+            set_type: '',
+            set_type_name: this.$route.params.set_type,
         }
     },
     methods: {
         startQuiz(id){
-            this.$router.push('/exam/'+id);
+            this.$router.push({name: 'exam', params: {set_type: this.set_type_name, set_id: id}});
         },
         loadSets(){
             this.$Progress.start();
-            this.$axios.get('api/set').then(({data}) => {
+            this.$axios.get('api/set', {
+                params: {
+                    set_type: this.set_type
+                }
+            }).then(({data}) => {
                 for(let x = 0; x < data.length; x++){
                     let hours = Math.floor((data[x].time / (60 * 60)) % 24);
                     let minutes = Math.floor((data[x].time / 60) % 60);
@@ -46,10 +52,16 @@ export default {
         }
     },
     created() {
+        switch(this.$route.params.set_type){
+            case 'jlt': this.set_type = 1; break;
+            case 'nce': this.set_type = 2; break;
+            case 'ncj': this.set_type = 3; break;
+            default: console.log('mao ni');
+        }
         let exam = JSON.parse(localStorage.getItem('exam'));
         let name = JSON.parse(localStorage.getItem('name'));
+        let set_type_url = JSON.parse(localStorage.getItem('set_type'));
         if(exam){
-            console.log('mao ni');
             this.$Swal.fire({
                 title: 'Ongoing Exam ('+exam.name+')',
                 text: 'An exam taken by '+name+' is currently active, would you like to continue?',
@@ -61,7 +73,7 @@ export default {
                 allowOutsideClick: false,
             }).then((result) => {
                 if (result.value) {
-                    this.$router.push('/exam/'+exam.id);
+                    this.$router.push({name: 'exam', params: {set_type: set_type_url, set_id: exam.id}});
                 }
                 else{
                     localStorage.clear();

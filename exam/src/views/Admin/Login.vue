@@ -46,7 +46,7 @@
             submit(){
                 this.logIn(this.form).then(() => {
                     this.$router.replace({
-                        name: 'set'
+                        name: 'main_admin'
                     })
                 })
             }

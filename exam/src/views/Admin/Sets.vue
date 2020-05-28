@@ -90,7 +90,6 @@ jQuery.extend(true, jQuery.fn.datetimepicker.defaults, {
 });
 
 export default {
-    name: 'sets',
     data(){
         return {
             editState: false,
@@ -107,6 +106,7 @@ export default {
                 time: '',
                 password: ''
             }),
+            set_type: '1'
         }
     },
     methods: {
@@ -125,7 +125,11 @@ export default {
                 this.form.password = undefined;
             }
             if(this.editState == false){
-                this.$axios.post('api/save_set', this.form)
+                this.$axios.post('api/save_set', this.form, {
+                    params: {
+                        set_type: this.set_type
+                    }
+                })
                 .then(() => {
                     this.$refs['add-set-modal'].hide();
                     this.loadSets();
@@ -184,7 +188,11 @@ export default {
         },
         loadSets(){
             this.$Progress.start();
-            this.$axios.get('api/set')
+            this.$axios.get('api/set', {
+                params: {
+                    set_type: this.set_type
+                }
+            })
             .then(({data}) => {
                 for(let x = 0; x < data.length; x++){
                     let hours = Math.floor((data[x].time / (60 * 60)) % 24);
@@ -207,6 +215,12 @@ export default {
         TimePicker
     },
     created() {
+        switch(this.$route.params.set_type){
+            case 'jlt': this.set_type = 1; break;
+            case 'nce': this.set_type = 2; break;
+            case 'ncj': this.set_type = 3; break;
+            default: console.log('mao ni');
+        }
         this.loadSets();
     }
 }

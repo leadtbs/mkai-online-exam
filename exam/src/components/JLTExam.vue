@@ -3,98 +3,104 @@
         <div class="card-body">
             <div class="row">
                 <div v-if="examStart" class="col-md-3">
-                    <div class="row">
-                        <div class="mx-auto pl-3">
-                            <circular-count-down-timer style="text-align: center;"
-                                :initial-value="exam.time"
-                                :size="80"
-                                :hour-label="''"
-                                :minute-label="''"
-                                :second-label="''"
-                                @finish="submitExam"
-                            ></circular-count-down-timer>
+                    <div class="sticky-div">
+                        <div class="row">
+                            <div class="mx-auto pl-3">
+                                <circular-count-down-timer style="text-align: center;"
+                                    :initial-value="exam.time"
+                                    :size="80"
+                                    :hour-label="''"
+                                    :minute-label="''"
+                                    :second-label="''"
+                                    @finish="submitExam"
+                                ></circular-count-down-timer>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="row mt-3 text-center" v-if="examStart">
-                        <div class="col-md-12 font-weight-bold" :class="sectionColor">
-                            {{ exam.section[current_section].name }}
+                        <div class="row mt-3 text-center" v-if="examStart">
+                            <div class="col-md-12 font-weight-bold" :class="sectionColor">
+                                {{ exam.section[current_section].name }}
+                            </div>
+                            <div class="col-md-12">
+                                <b-progress striped :max="max">
+                                    <b-progress-bar
+                                        v-for="(sections, index) in exam.section"
+                                        :key="index"
+                                        :variant="variant[index]"
+                                        :value="(progress[index].bar / progress[index].max) * 100">
+                                    </b-progress-bar>
+                                </b-progress>
+                            </div>
                         </div>
-                        <div class="col-md-12">
-                            <b-progress striped :max="max">
-                                <b-progress-bar
-                                    v-for="(sections, index) in exam.section"
+
+                        <div class="row mt-5 mb-2" v-if="examStart">
+                            <div class="col-md-9 text-center m-auto">
+                                <button
+                                    v-for="(question, index) in exam.section[current_section].question"
                                     :key="index"
-                                    :variant="variant[index]"
-                                    :value="(progress[index].bar / progress[index].max) * 100">
-                                </b-progress-bar>
-                            </b-progress>
+                                    :class="[dottedProgress(index), dottedPicked(index)]"
+                                    @click="pickQuestion(index)"
+                                    class="rounded-circle btn btn-sm ml-1"
+                                    style="width: 5px; height: 18px;"></button>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="row mt-5 mb-2" v-if="examStart">
-                        <div class="col-md-9 text-center m-auto">
-                            <button
-                                v-for="(question, index) in exam.section[current_section].question"
-                                :key="index"
-                                :class="[dottedProgress(index), dottedPicked(index)]"
-                                @click="pickQuestion(index)"
-                                class="rounded-circle btn btn-sm ml-1"
-                                style="width: 5px; height: 18px;"></button>
+                        <div class="row mt-5" v-if="exam.section[current_section].question[current].audio">
+                            <div class="col-md-12 text-center" style="display: inline-block;">
+
+                                <button 
+                                    :disabled="playing || exam.section[current_section].question[current].audio_counter < 1" 
+                                    @click="playAudio(exam.section[current_section].question[current].audio)" class="btn btn-md btn-success"><i class="fa fa-play"></i></button>&nbsp;
+                                    <font-awesome-icon 
+                                        v-for="index in 2"
+                                        :key="index"
+                                        icon="heart" 
+                                        class="align-middle fa-2x"
+                                        :class="(exam.section[current_section].question[current].audio_counter >= index) ? 'text-danger' : 'text-secondary'"
+                                    />
+                        
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="row mt-5" v-if="exam.section[current_section].question[current].audio">
-                        <div class="col-md-12 text-center" style="display: inline-block;">
-
-                            <button 
-                                :disabled="playing || exam.section[current_section].question[current].audio_counter < 1" 
-                                @click="playAudio(exam.section[current_section].question[current].audio)" class="btn btn-md btn-success"><i class="fa fa-play"></i></button>&nbsp;
-                                <font-awesome-icon 
-                                    v-for="index in 2"
-                                    :key="index"
-                                    icon="heart" 
-                                    class="align-middle fa-2x"
-                                    :class="(exam.section[current_section].question[current].audio_counter >= index) ? 'text-danger' : 'text-secondary'"
-                                />
-                    
-                        </div>
-                    </div>
-
-                    <div class="row mt-5 mb-2">
-                        <div class="col-md-12 text-center">
-                            <button :disabled="submitDisabled" @click="(submit) ? submitButton() : nextSection()" class="btn btn-md btn-danger">{{ (submit) ? 'Submit' : 'Next Section' }}</button>&nbsp;
-                            <button :disabled="submitDisabled" @click="nextQuestion()" class="btn btn-md btn-success">Next Question</button>
+                        <div class="row mt-5 mb-2">
+                            <div class="col-md-12 text-center">
+                                <button :disabled="submitDisabled" @click="(submit) ? submitButton() : nextSection()" class="btn btn-md btn-danger">{{ (submit) ? 'Submit' : 'Next Section' }}</button>&nbsp;
+                                <button :disabled="submitDisabled" @click="nextQuestion()" class="btn btn-md btn-success">Next Question</button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div v-if="examStart" class="col-md-6">
-                    <img :src="$URL+'/img/question/'+exam.section[current_section].question[current].picture" alt="question" class="w-100 border">
-                </div>
-                <div v-if="examStart" class="col-md-3 overflow-auto" style="font-size: 24px; min-height: 100px; max-height: 400px;">
-                    <div v-for="(choice_set, index) in exam.section[current_section].question[current].choice_set" :key="index" class="row border border-dark mb-2 pb-2">
-                        <div class="col-md-12 font-weight-bold">
-                            {{ choice_set.description }}
-                        </div>
-                        <div v-if="exam.section[current_section].question[current].choice_type == true" class="col-md-12">
-                            <div class="row">
-                                <div v-for="(choices, index2) in choice_set.choices" :key="index2" class="col-6 col-sm-6 col-md-6 p-1">
-                                    <div @click="pick(index, index2)" v-bind:value="index2" class="border mt-3 text-wrap clickable" v-if="choices.choices != ''">
-                                        <img :src="$URL+'/img/choices/'+choices.choices" alt="choice" class="w-100 h-100" :class="ifPicked(index, index2)">
+                <div v-if="examStart" class="col-md-9">
+
+                    <div class="col-md-12">
+                        <img :src="$URL+'/img/question/'+exam.section[current_section].question[current].picture" alt="question" class="w-100 border">
+                    </div>
+                    <div class="col-md-12 overflow-auto mt-3" style="font-size: 24px; min-height: 100px; max-height: 400px;">
+                        <div v-for="(choice_set, index) in exam.section[current_section].question[current].choice_set" :key="index" class="row border border-dark mb-2 pb-2">
+                            <div class="col-md-12 font-weight-bold">
+                                {{ choice_set.description }}
+                            </div>
+                            <div v-if="exam.section[current_section].question[current].choice_type == true" class="col-md-12">
+                                <div class="row">
+                                    <div v-for="(choices, index2) in choice_set.choices" :key="index2" class="col-6 col-sm-6 col-md-3 p-1">
+                                        <div @click="pick(index, index2)" v-bind:value="index2" class="border mt-3 text-wrap clickable" v-if="choices.choices != ''">
+                                            <img :src="$URL+'/img/choices/'+choices.choices" alt="choice" class="w-100 h-100" :class="ifPicked(index, index2)">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div v-if="exam.section[current_section].question[current].choice_type == false" class="col-md-12">
+                                <div v-for="(choices, index2) in choice_set.choices" :key="index2" class="p-0">
+                                    <div @click="pick(index, index2)" v-bind:value="index2" class="border mt-2 text-wrap clickable" v-if="choices.choices != ''" :class="ifPicked(index, index2)">
+                                        {{ choices.choices }}
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div v-if="exam.section[current_section].question[current].choice_type == false" class="col-md-12">
-                            <div v-for="(choices, index2) in choice_set.choices" :key="index2" class="p-0">
-                                <div @click="pick(index, index2)" v-bind:value="index2" class="border mt-2 text-wrap clickable" v-if="choices.choices != ''" :class="ifPicked(index, index2)">
-                                    {{ choices.choices }}
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
 
@@ -192,41 +198,47 @@
 </template>
 
 <script>
-import { isIOS } from 'mobile-device-detect';
+import { isIOS } from 'mobile-device-detect'
 import jsPDF from 'jspdf'
 import 'jspdf-autotable'
 var audio, interval
 
 export default {
-    name: 'exam',
+    name: 'jlt_exam',
     data() {
         return {
+            // BOTH -- START
             form: {
                 name: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('name')) : '',
                 sensei: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('sensei')) : '',
                 start: (localStorage.getItem('start')) ? JSON.parse(localStorage.getItem('start')) : '',
                 password: ''
             },
-            variant: ['info', 'danger', 'primary', 'success'],
             max: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('max')) : 0,
-            progress: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('progress')) : [],
-            playing: false,
+            set_type: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('set_type')) : this.$route.params.set_type,
             submit: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('submit')) : false,
             submitDisabled: false,
-            current_section: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('current_section')) : 0,
-            current: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('current')) : 0,
             totalAssets: 0,
             assetsLoaded: 0,
             allLoaded: false,
             examStart: false,
-            exam: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('exam')) : null,
             submitInfo: false,
-            timeSpent: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('timeSpent')) : [{'time': 0}, {'time': 0}, {'time': 0}, {'time': 0},],
-            iOS: isIOS ? true : false,
             picture: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('picture')) : null,
             picTaken: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('picTaken')) : false,
             mediaAvailable: ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) ? true : false,
+            iOS: isIOS ? true : false,
             continueExam: false,
+            exam: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('exam')) : null,
+            current: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('current')) : 0,
+            // BOTH -- END
+
+            // JLT -- START
+            variant: ['info', 'danger', 'primary', 'success'],
+            progress: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('progress')) : [],
+            playing: false,
+            current_section: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('current_section')) : 0,
+            timeSpent: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('timeSpent')) : [{'time': 0}, {'time': 0}, {'time': 0}, {'time': 0},],
+            // JLT -- END
         }
     },
     methods: {
@@ -308,11 +320,18 @@ export default {
             this.submitInfo = true;
             this.$axios.post('/api/confirm-password', {
                 form: this.form,
-                id: this.$route.params.set_id
+                id: this.$route.params.set_id,
+                set_type: this.set_type
             })
             .then(({data}) => {
                 this.form.password = '';
                 if(data !== 'wrong'){
+                    const video = document.querySelector('video');
+                    const mediaStream = video.srcObject;
+                    const tracks = mediaStream.getTracks();
+                    tracks[0].stop();
+                    tracks.forEach(track => track.stop());
+                    
                     for(let x = 0; x < data.section.length; x++){
                         for(let y = 0; y < data.section[x].question.length; y++){
                             this.totalAssets++;
@@ -329,7 +348,6 @@ export default {
                                     }
                                 }
                             }
-
                         }
                     }
 
@@ -467,7 +485,6 @@ export default {
                 }
             }
 
-            this.progressBar;
             return (picked) ? 'bg-success' : 'bg-primary';
         },
         dottedPicked(index){
@@ -650,7 +667,7 @@ export default {
                     }
                 });
             })
-        }
+        },
     },
     computed: {
         sectionColor() {
@@ -775,6 +792,13 @@ export default {
             },
             deep: true
         },
+        set_type: {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('set_type', JSON.stringify(data));
+            },
+            deep: true
+        },
         exam: {
             immediate: true,
             handler(data) {
@@ -782,7 +806,6 @@ export default {
             },
             deep: true
         },
-
     },
     created() {
     },
@@ -815,39 +838,3 @@ export default {
     }
 }
 </script>
-
-<style scoped>
-    .picked {
-        outline-style: solid;
-        outline-color: blue;
-    }
-    .clickable {
-        cursor: pointer;
-    }
-    .tempImage{
-        display: inline-block;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: contain;
-        height: 500px;
-    }
-    .camera {
-        width: 80%;
-        max-height: 500px;
-        margin: 0 auto;
-    }
-    #feed, .picture{
-        display: block;
-        width: 80%;
-        max-height: 300px;
-        margin: 0 auto;
-        background-color: #171717;
-        box-shadow: 5px 5px 12px 0px rgba(0,0,0, 0.25);
-    }
-    #canvas{
-        display: block;
-        width: 100%;
-        max-height: 300px;
-        margin: 0 auto;
-    }
-</style>

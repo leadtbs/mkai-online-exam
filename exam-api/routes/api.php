@@ -24,3 +24,4 @@ Route::get('set', 'Guest\GuestController@getSetAll');
 Route::get('start_exam/{id}', 'Guest\GuestController@startExam');
 Route::post('confirm-password', 'Guest\GuestController@confirmPassword');
 Route::post('submit_exam', 'Guest\GuestController@submitExam');
+Route::post('submit_nc_exam', 'Guest\GuestController@submitNCExam');
