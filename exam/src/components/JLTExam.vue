@@ -835,6 +835,8 @@ export default {
             })
         }
         else{
+            localStorage.clear();
+            this.resetData();
             this.initExam();
         }
     }

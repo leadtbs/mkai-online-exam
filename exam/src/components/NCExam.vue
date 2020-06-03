@@ -33,8 +33,8 @@
                                     :key="index"
                                     :class="[dottedProgress(index), dottedPicked(index)]"
                                     @click="pickQuestion(index)"
-                                    class="rounded-circle btn btn-sm ml-1"
-                                    style="width: 5px; height: 18px;"></button>
+                                    class="rounded-circle btn btn-sm ml-1 mt-1 pill font-weight-bold"
+                                    style="width: 35px;">{{ index }}</button>
                             </div>
                         </div>
 
@@ -669,6 +669,8 @@ export default {
             })
         }
         else{
+            localStorage.clear();
+            this.resetData();
             this.initExam();
         }
     }
