@@ -25,7 +25,6 @@ class GuestController extends Controller
         $set_type_let = ($set_type == 'nce') ? 'E' : 'J';
         $set = Set::find($id);
         if(Hash::check($request->form['password'], $set->password)){
-            info($set_type);
             if($set_type == 'jlt'){
                 $section = Section::with(['question' => function($query) use($id){
                     $query->with('choice_set.choices')->where('set_id', $id);
