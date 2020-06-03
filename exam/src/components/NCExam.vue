@@ -26,19 +26,19 @@
                             </div>
                         </div>
 
-                        <div class="row mt-5 mb-2" v-if="examStart">
-                            <div class="col-md-9 text-center m-auto" >
+                        <div class="row mt-4 mb-2" v-if="examStart">
+                            <div class="col-md-12 text-center m-auto" >
                                 <button
                                     v-for="(question, index) in exam.question"
                                     :key="index"
                                     :class="[dottedProgress(index), dottedPicked(index)]"
                                     @click="pickQuestion(index)"
-                                    class="rounded-circle btn btn-sm ml-1 mt-1 pill font-weight-bold"
-                                    style="width: 35px;">{{ index }}</button>
+                                    class="btn btn-sm ml-1 mt-3 font-weight-bold text-white circle-pick"
+                                    style="width: 35px;">{{ index+1 }}</button>
                             </div>
                         </div>
 
-                        <div class="row mt-5 mb-2">
+                        <div class="row mt-4 mb-2">
                             <div class="col-md-12 text-center">
                                 <button :disabled="submitDisabled" @click="submitButton()" class="btn btn-md btn-danger">Submit</button>&nbsp;
                                 <button :disabled="submitDisabled" @click="nextQuestion()" class="btn btn-md btn-success">Next Question</button>
@@ -208,6 +208,7 @@ export default {
     },
     methods: {
         resetData(){
+            localStorage.setItem('set_type', JSON.stringify(this.$route.params.set_type));
             this.form.name = '';
             this.form.sensei = '';
             this.max = 0;
@@ -444,7 +445,7 @@ export default {
                 }
             }
 
-            return (picked) ? 'bg-success' : 'bg-primary';
+            return (picked) ? 'bg-answered' : 'bg-unanswered';
         },
         dottedPicked(index){
             return (this.current == index) ? 'btn-outline-danger' : '';
@@ -611,13 +612,6 @@ export default {
             immediate: true,
             handler(data) {
                 localStorage.setItem('bar', JSON.stringify(data))
-            },
-            deep: true
-        },
-        set_type: {
-            immediate: true,
-            handler(data) {
-                localStorage.setItem('set_type', JSON.stringify(data))
             },
             deep: true
         },

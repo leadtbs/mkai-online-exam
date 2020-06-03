@@ -62,4 +62,10 @@ export default {
         position: sticky;
         top: 20px;
     }
+    .bg-unanswered{
+        background-color: #487BA6 !important;
+    }
+    .bg-answered{
+        background-color: #298463 !important;
+    }
 </style>

@@ -33,19 +33,19 @@
                             </div>
                         </div>
 
-                        <div class="row mt-5 mb-2" v-if="examStart">
-                            <div class="col-md-9 text-center m-auto">
+                        <div class="row mt-4 mb-2" v-if="examStart">
+                            <div class="col-md-12 text-center m-auto">
                                 <button
                                     v-for="(question, index) in exam.section[current_section].question"
                                     :key="index"
                                     :class="[dottedProgress(index), dottedPicked(index)]"
                                     @click="pickQuestion(index)"
-                                    class="rounded-circle btn btn-sm ml-1"
-                                    style="width: 5px; height: 18px;"></button>
+                                    class="btn btn-sm ml-1 font-weight-bold text-white circle-pick"
+                                    style="width: 35px;">{{ index+1 }}</button>
                             </div>
                         </div>
 
-                        <div class="row mt-5" v-if="exam.section[current_section].question[current].audio">
+                        <div class="row mt-4" v-if="exam.section[current_section].question[current].audio">
                             <div class="col-md-12 text-center" style="display: inline-block;">
 
                                 <button 
@@ -243,6 +243,7 @@ export default {
     },
     methods: {
         resetData(){
+            localStorage.setItem('set_type', JSON.stringify(this.$route.params.set_type));
             this.form.name = '';
             this.form.sensei = '';
             this.max = 0;
@@ -487,7 +488,7 @@ export default {
                 }
             }
 
-            return (picked) ? 'bg-success' : 'bg-primary';
+            return (picked) ? 'bg-answered' : 'bg-unanswered';
         },
         dottedPicked(index){
             return (this.current == index) ? 'btn-outline-danger' : '';
@@ -791,13 +792,6 @@ export default {
             immediate: true,
             handler(data) {
                 localStorage.setItem('timeSpent', JSON.stringify(data));
-            },
-            deep: true
-        },
-        set_type: {
-            immediate: true,
-            handler(data) {
-                localStorage.setItem('set_type', JSON.stringify(data));
             },
             deep: true
         },
