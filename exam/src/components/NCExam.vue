@@ -562,6 +562,10 @@ export default {
                         timer: 2500,
                         onClose: () => {
                             this.examStart = true;  
+                            
+                            interval = setInterval(() => {
+                                this.exam.time--;
+                            }, 1000)
                         }
                     })
                 }, 1500);
