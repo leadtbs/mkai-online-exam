@@ -33,7 +33,7 @@
                                     :key="index"
                                     :class="[dottedProgress(index), dottedPicked(index)]"
                                     @click="pickQuestion(index)"
-                                    class="btn btn-sm ml-1 mt-3 font-weight-bold text-white circle-pick"
+                                    class="rounded-circle btn btn-sm ml-1 mr-1 mt-2 font-weight-bold text-white circle-pick"
                                     style="width: 35px;">{{ index+1 }}</button>
                             </div>
                         </div>
@@ -51,7 +51,7 @@
                     <div class="col-md-12">
                         <img :src="$URL+'/img/ncquestion/'+exam.question[current].picture" alt="question" class="w-100 border">
                     </div>
-                    <div class="col-md-12 overflow-auto mt-3" style="font-size: 24px; min-height: 100px; max-height: 400px;">
+                    <div class="col-md-12 overflow-auto mt-3" style="font-size: 24px;">
                         <div v-for="(choice_set, index) in exam.question[current].choice_set" :key="index" class="row border border-dark mb-2 pb-2">
                             <div class="col-md-12 font-weight-bold">
                                 {{ choice_set.description }}
@@ -183,40 +183,41 @@ export default {
         return {
             // BOTH -- START
             form: {
-                name: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('name')) : '',
-                sensei: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('sensei')) : '',
-                start: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('start')) : '',
+                name: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('name')) : null, // ''
+                sensei: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('sensei')) : null, // ''
+                start: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('start')) : null, // ''
                 password: ''
             },
-            max: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('max')) : 0,
-            bar: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('bar')) : 0,
-            set_type: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('set_type')) : this.$route.params.set_type,
-            submit: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('submit')) : false,
+            max: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('max')) : null, // 0
+            bar: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('bar')) : null, // 0
+            set_type: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('set_type')) : null, // set_type params
+            submit: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('submit')) : null, // false
             submitDisabled: false,
             totalAssets: 0,
             assetsLoaded: 0,
             allLoaded: false,
             examStart: false,
             submitInfo: false,
-            picture: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('picture')) : null,
-            picTaken: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('picTaken')) : false,
+            picture: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('picture')) : '', // null
+            picTaken: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('picTaken')) : null, // false
             mediaAvailable: ('mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices) ? true : false,
             continueExam: false,
             exam: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('exam')) : null,
-            current: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('current')) : 0,
+            current: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('current')) : null, // 0
         }
     },
     methods: {
         resetData(){
-            localStorage.setItem('set_type', JSON.stringify(this.$route.params.set_type));
             this.form.name = '';
             this.form.sensei = '';
+            this.form.start = '';
             this.max = 0;
             this.submit = false;
             this.current = 0;
             this.exam = null;
             this.picture = null;
             this.picTaken = false;
+            this.set_type = this.$route.params.set_type;
         },
         shuffleQ(array){
             let finalArray = [];
@@ -627,7 +628,6 @@ export default {
             handler(data) {
                 localStorage.setItem('current', JSON.stringify(data));
             },
-            deep: true
         },
         exam: {
             immediate: true,
@@ -636,8 +636,13 @@ export default {
             },
             deep: true
         },
-    },
-    created() {
+        set_type: {
+            immediate: true,
+            handler(data) {
+                localStorage.setItem('set_type', JSON.stringify(data));
+            },
+            deep: true
+        },
     },
     mounted() {
         if(this.exam){
