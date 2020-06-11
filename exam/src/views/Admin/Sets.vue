@@ -14,7 +14,7 @@
                         <tr>
                             <td class="align-middle" style="width:20%"><font-awesome-icon class="fa-fw text-info" icon="clock" />{{ set.time }}</td>
                             <td class="align-middle" style="width:15%"><font-awesome-icon class="fa-fw text-success" icon="question" />{{ set.question_count }}</td>
-                            <td class="align-middle" style="width:15%"><font-awesome-icon class="fa-fw text-success" icon="star" />{{ set.choice_count }}</td>
+                            <td class="align-middle" style="width:15%"><font-awesome-icon class="fa-fw text-warning" icon="star" />{{ set.choice_count }}</td>
                             <td class="align-middle" style="width:10%">
                                 <b-button variant="primary" size="xs" @click="editSetForm(set)"><font-awesome-icon icon="edit" /></b-button>
                             </td>
