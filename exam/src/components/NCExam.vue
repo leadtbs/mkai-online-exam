@@ -12,7 +12,7 @@
                                     :hour-label="''"
                                     :minute-label="''"
                                     :second-label="''"
-                                    @finish="submitExam"
+                                    @finish="timesUp"
                                 ></circular-count-down-timer>
                             </div>
                         </div>
@@ -311,8 +311,17 @@ export default {
             this.picTaken = true;            
         },
         startExam(){
+            let d = new Date();
+            let date = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+            let minutes = d.getMinutes();
+            if(minutes.toString().length == 1){
+                minutes = '0' + minutes;
+            }
+            let time = d.getHours() + ':' + minutes;
+            
             this.submitInfo = true;
             this.$axios.post('/api/confirm-password', {
+                date: date + ' ' + time,
                 form: this.form,
                 id: this.$route.params.set_id,
                 set_type: this.set_type
@@ -480,9 +489,30 @@ export default {
                 }
             });
         },
+        timesUp(){
+            if(this.submitDisabled == false){
+                this.$Swal.fire({
+                    icon: 'warning',
+                    title: `Time's Up!`,
+                    text: 'A PDF File with your result will be downloaded shortly',
+                    showConfirmButton: false,
+                    timer: 5000,
+                })
+                this.submitExam();
+            }
+        },
         submitExam(){
+            let d = new Date();
+            let date = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+            let minutes = d.getMinutes();
+            if(minutes.toString().length == 1){
+                minutes = '0' + minutes;
+            }
+            let time = d.getHours() + ':' + minutes;
+
             this.submitDisabled = true;
             this.$axios.post('/api/submit_nc_exam', {
+                date: date + ' ' + time,
                 set_type: this.set_type,
                 exam: this.exam
             })
@@ -513,16 +543,6 @@ export default {
                 if(this.picTaken){
                     doc.addImage(this.picture, 'JPEG', 400, 15, 150, 85);
                 }
-                
-                let d = new Date();
-                let date = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
-                let minutes = d.getMinutes();
-                
-                if(minutes.toString().length == 1){
-                    minutes = '0' + minutes;
-                }
-
-                let time = d.getHours() + ':' + minutes;
 
                 doc.text('Start of Class: ' + this.form.start, 40, 90)
                 doc.text('Date & Time: ' + date + ' ' + time, 40, 110)
@@ -540,6 +560,19 @@ export default {
                     localStorage.clear();
                     this.$router.push('/');
                 }, 5000)
+            })
+            .catch(() => {
+                this.$Swal.fire({
+                    icon: 'warning',
+                    title: 'No Internet Connection!',
+                    text: 'Please check connection and try again',
+                    allowOutsideClick: false,
+                    confirmButtonText: 'Submit again'
+                }).then((result) => {
+                    if(result.value) {
+                        this.submitExam();
+                    }
+                });
             })
         },
     },
@@ -561,7 +594,12 @@ export default {
                         showConfirmButton: false,
                         timer: 2500,
                         onClose: () => {
-                            this.examStart = true;  
+                            this.examStart = true;
+
+                            let temp = JSON.parse(localStorage.getItem('exam'));
+                            if(temp.time < 1){
+                                this.timesUp();
+                            }
                             
                             interval = setInterval(() => {
                                 this.exam.time--;

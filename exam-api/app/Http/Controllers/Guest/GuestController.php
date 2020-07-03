@@ -20,6 +20,7 @@ use PDF;
 class GuestController extends Controller
 {
     public function confirmPassword(Request $request){
+        $date = $request->date;
         $id = $request->id;
         $set_type = $request->set_type;
         $set_type_let = ($set_type == 'nce') ? 'E' : 'J';
@@ -40,6 +41,8 @@ class GuestController extends Controller
             $set->set_type = $set_type;
             $set->stud_name = $request->form['name'];
             $set->stud_sensei = $request->form['sensei'];
+
+            info($date.': '.$set->stud_name.' | '.$set->name.' | '.$set->stud_sensei.' | START');
             return $set;
         }else{
             return 'wrong';
@@ -61,11 +64,12 @@ class GuestController extends Controller
     }
 
     public function submitExam(Request $request){
+        $date = $request->date;
         $scores = [];
         $result = [];
         $total_score = 0; $total_total = 0;
 
-        foreach($request->section as $s){
+        foreach($request->exam['section'] as $s){
             $total = 0;
             $score = 0;
             foreach($s['question'] as $q){
@@ -100,18 +104,21 @@ class GuestController extends Controller
 
         $html = '';
         
-        $html .= '<h1>Set Name: '.$request['name'].'</h1>';
+        $html .= '<h1>Set Name: '.$request['exam']['name'].'</h1>';
         $html .= '<table border="1"><tbody>';
 
+        info($date.': '.$request['exam']['stud_name'].' | '.$request['exam']['name'].' | '.$request['exam']['stud_sensei'].' | END');
+
         return [
-            'set_name' => $request['name'],
-            'stud_name' =>$request['stud_name'],
-            'stud_sensei' =>$request['stud_sensei'],
+            'set_name' => $request['exam']['name'],
+            'stud_name' => $request['exam']['stud_name'],
+            'stud_sensei' => $request['exam']['stud_sensei'],
             'scores' => $scores
         ];
     }
 
     public function submitNCExam(Request $request){
+        $date = $request->date;
         $set_type = $request->set_type;
         $scores = [];
         $result = [];
@@ -155,23 +162,25 @@ class GuestController extends Controller
             array_push($scores, $result);
         }
 
-            data_set($result, 'category', 'TOTAL');
-            data_set($result, 'score', $total_score . '/' . $total_total . ' (' . round(($total_score / $total_total) * 100) . '%)');
-            data_set($result, 'passing', ceil($total_total * .80));
-            data_set($result, 'status', ((($total_score / $total_total) * 100) >= 80) ? 'Passed' : 'Failed');
-            array_push($scores, $result);  
+        data_set($result, 'category', 'TOTAL');
+        data_set($result, 'score', $total_score . '/' . $total_total . ' (' . round(($total_score / $total_total) * 100) . '%)');
+        data_set($result, 'passing', ceil($total_total * .80));
+        data_set($result, 'status', ((($total_score / $total_total) * 100) >= 80) ? 'Passed' : 'Failed');
+        array_push($scores, $result);  
 
-            $html = '';
-            
-            $html .= '<h1>Set Name: '.$request['exam']['name'].'</h1>';
-            $html .= '<table border="1"><tbody>';
+        $html = '';
+        
+        $html .= '<h1>Set Name: '.$request['exam']['name'].'</h1>';
+        $html .= '<table border="1"><tbody>';
 
-            return [
-                'set_name' => $request['exam']['name'],
-                'stud_name' =>$request['exam']['stud_name'],
-                'stud_sensei' =>$request['exam']['stud_sensei'],
-                'scores' => $scores
-            ];
+        info($date.': '.$request['exam']['stud_name'].' | '.$request['exam']['name'].' | '.$request['exam']['stud_sensei'].' | END');
+
+        return [
+            'set_name' => $request['exam']['name'],
+            'stud_name' =>$request['exam']['stud_name'],
+            'stud_sensei' =>$request['exam']['stud_sensei'],
+            'scores' => $scores
+        ];
     }
     
     public function getSetAll(Request $request){
