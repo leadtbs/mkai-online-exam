@@ -193,10 +193,7 @@ class QuizController extends Controller
             $choice_set->description = $d['description'];
             foreach($d['choices'] as $key => $c){
                 $choices = ($isJLT) ? Choices::find($c['id']) : NCChoices::find($c['id']);
-                info($choices);
-                info($key);
                 if($d['correct'] === $key){
-                    info('correct');
                     $choices->correct = 1;
                 }else{
                     $choices->correct = 0;
