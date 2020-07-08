@@ -90,7 +90,7 @@ class QuizController extends Controller
         $question = ($isJLT) ? new Question : new NCQuestion;
 
         $fileextension = $request->image->getClientOriginalExtension();
-        $filename = (sha1(time().$request->image->getClientOriginalName())).'.'.$fileextension;
+        $filename = (sha1(date('jSFY').time().$request->image->getClientOriginalName())).'.'.$fileextension;
 
         if($isJLT){
             $request->image->move(public_path('img/question'), $filename);
@@ -105,7 +105,7 @@ class QuizController extends Controller
 
         if($request->hasFile('audio')){
             $fileextension = $request->audio->getClientOriginalExtension();
-            $filename = (sha1(time().$request->audio->getClientOriginalName())).'.'.$fileextension;
+            $filename = (sha1(date('jSFY').time().$request->audio->getClientOriginalName())).'.'.$fileextension;
             $request->audio->move(public_path('audio'), $filename);
             $question->audio = $filename;
         }
@@ -130,7 +130,7 @@ class QuizController extends Controller
                         $choice = ($isJLT) ? new Choices : new NCChoices;
                         $choice->choice_set()->associate($choice_set);
                         $fileextension = $c[$x][$y]->getClientOriginalExtension();
-                        $filename = (sha1(time().$c[$x][$y]->getClientOriginalName())).'.'.$fileextension;
+                        $filename = (sha1(date('jSFY').time().$c[$x][$y]->getClientOriginalName())).'.'.$fileextension;
                         if($isJLT){
                             $c[$x][$y]->move(public_path('img/choices'), $filename);
                         }else{
@@ -169,7 +169,7 @@ class QuizController extends Controller
         if($request->hasFile('image')){
             $q = ($isJLT) ? 'question' : 'ncquestion';
             $fileextension = $request->image->getClientOriginalExtension();
-            $filename = (sha1(time().$request->image->getClientOriginalName())).'.'.$fileextension;
+            $filename = (sha1(date('jSFY').time().$request->image->getClientOriginalName())).'.'.$fileextension;
             $request->image->move(public_path('img/'.$q), $filename);
             $image_path = public_path().'/img\/'.$q.'/'.$question->picture;
             File::delete($image_path);
@@ -178,7 +178,7 @@ class QuizController extends Controller
 
         if($request->hasFile('audio')){
             $fileextension = $request->audio->getClientOriginalExtension();
-            $filename = (sha1(time().$request->audio->getClientOriginalName())).'.'.$fileextension;
+            $filename = (sha1(date('jSFY').time().$request->audio->getClientOriginalName())).'.'.$fileextension;
             $request->audio->move(public_path('audio'), $filename);
             $audio_path = public_path().'/audio\/'.$question->audio;
             File::delete($audio_path);
@@ -214,7 +214,7 @@ class QuizController extends Controller
                     $choice = ($isJLT) ? Choices::find($id) : NCChoices::find($id) ;
                     $choices = $request->choices;
                     $fileextension = $choices[$x][$y]->getClientOriginalExtension();
-                    $filename = (sha1(time().$choices[$x][$y]->getClientOriginalName())).'.'.$fileextension;
+                    $filename = (sha1(date('jSFY').time().$choices[$x][$y]->getClientOriginalName())).'.'.$fileextension;
                     $choices[$x][$y]->move(public_path('img/'+$c), $filename);
                     $choice_path = public_path().'/img\/'+$c+'/'.$choice->choices;
                     File::delete($choice_path);
