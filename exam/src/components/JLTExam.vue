@@ -215,7 +215,7 @@ export default {
                 password: ''
             },
             max: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('max')) : null, // 0
-            set_type: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('set_type')) : null, // set_type params
+            set_type: this.$route.params.set_type, // set_type params
             submit: (localStorage.getItem('exam')) ? JSON.parse(localStorage.getItem('submit')) : null, // false
             submitDisabled: false,
             totalAssets: 0,
@@ -340,9 +340,10 @@ export default {
                     if(this.mediaAvailable){
                         const video = document.querySelector('video');
                         const mediaStream = video.srcObject;
-                        const tracks = mediaStream.getTracks();
-                        tracks[0].stop();
-                        tracks.forEach(track => track.stop());
+                        if(mediaStream != null){
+                            const tracks = mediaStream.getTracks();
+                            tracks.forEach(track => track.stop())
+                        }
                     }
 
                     for(let x = 0; x < data.section.length; x++){
