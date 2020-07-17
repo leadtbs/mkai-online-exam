@@ -107,7 +107,7 @@ class GuestController extends Controller
         $html .= '<h1>Set Name: '.$request['exam']['name'].'</h1>';
         $html .= '<table border="1"><tbody>';
 
-        info($date.': '.$request['exam']['stud_name'].' | '.$request['exam']['name'].' | '.$request['exam']['stud_sensei'].' | END');
+        info($date.': '.$request['exam']['stud_name'].' | '.$request['exam']['name'].' | '.$request['exam']['stud_sensei'].' | END | '.$result['score']);
 
         return [
             'set_name' => $request['exam']['name'],
