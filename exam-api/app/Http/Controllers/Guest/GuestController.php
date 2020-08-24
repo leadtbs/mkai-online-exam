@@ -42,7 +42,9 @@ class GuestController extends Controller
             $set->stud_name = $request->form['name'];
             $set->stud_sensei = $request->form['sensei'];
 
-            info($date.': '.$set->stud_name.' | '.$set->name.' | '.$set->stud_sensei.' | START');
+            $start = ($request->continue) ? 'CONTINUE' : 'START';
+
+            info($date.': '.$set->stud_name.' | '.$set->name.' | '.$set->stud_sensei.' | '.$start);
             return $set;
         }else{
             return 'wrong';

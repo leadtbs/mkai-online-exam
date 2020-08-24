@@ -332,7 +332,8 @@ export default {
                 date: date + ' ' + time,
                 form: this.form,
                 id: this.$route.params.set_id,
-                set_type: this.set_type
+                set_type: this.set_type,
+                continue: this.continueExam
             })
             .then(({data}) => {
                 this.form.password = '';
