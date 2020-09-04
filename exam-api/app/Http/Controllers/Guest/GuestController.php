@@ -125,7 +125,6 @@ class GuestController extends Controller
         $scores = [];
         $result = [];
         $total_score = 0; $total_total = 0;
-        $set_type = 'nce';
 
         $category = NCCategory::
                     when($set_type == 'nce', function($query){
