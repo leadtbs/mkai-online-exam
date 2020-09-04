@@ -125,7 +125,7 @@ class GuestController extends Controller
         $scores = [];
         $result = [];
         $total_score = 0; $total_total = 0;
-        info($request);
+        $set_type = 'nce';
 
         $category = NCCategory::
                     when($set_type == 'nce', function($query){
@@ -134,8 +134,6 @@ class GuestController extends Controller
                     ->when($set_type == 'ncj', function($query){
                         $query->where('type', 'J');
                     })->get();
-        
-        info($category);
 
         foreach($category as $cat){
             $total = 0;
@@ -156,9 +154,6 @@ class GuestController extends Controller
                     }
                 }
             }
-
-            info($total);
-            info($score);
 
             $total_score += $score;
             $total_total += $total;
