@@ -311,6 +311,7 @@ export default {
             this.picTaken = true;            
         },
         startExam(){
+            localStorage.setItem('set_type', JSON.stringify(this.$route.params.set_type));
             let d = new Date();
             let date = d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
             let minutes = d.getMinutes();
@@ -677,13 +678,6 @@ export default {
             immediate: true,
             handler(data) {
                 localStorage.setItem('exam', JSON.stringify(data));
-            },
-            deep: true
-        },
-        set_type: {
-            immediate: true,
-            handler(data) {
-                localStorage.setItem('set_type', JSON.stringify(data));
             },
             deep: true
         },

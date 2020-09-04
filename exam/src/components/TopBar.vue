@@ -7,7 +7,7 @@
                 <b-navbar-nav><b-nav-item href="#" @click.prevent="signOut">Logout</b-nav-item></b-navbar-nav>       
             </template>
             <template v-else>
-                <b-navbar-nav><b-nav-item :to="{name: 'login'}" href="#">Login</b-nav-item></b-navbar-nav>
+                <b-navbar-nav><b-nav-item :to="{name: 'login'}" href="#"><span style="color: transparent !important;">Login</span></b-nav-item></b-navbar-nav>
             </template>
         </b-navbar>
     </div>
