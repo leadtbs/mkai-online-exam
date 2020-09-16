@@ -190,7 +190,7 @@ class GuestController extends Controller
         if($request->pdf){
             $pdf = base64_decode($request->pdf);
             $filename = time().' '.$request->set.' - '.$request->student.' Result.pdf';
-            $path = public_path().'\results\\'.$request->type.'\\'.$request->date.'\\';
+            $path = public_path().'/results/'.$request->type.'/'.$request->date.'/';
 
             if(!file_exists($path)){
                 File::makeDirectory($path);
