@@ -676,6 +676,17 @@ export default {
                     body: rows,
                     margin: {top:130}
                 })
+
+                let pdf = btoa(doc.output());
+
+                this.$axios.post('/api/download_result', {
+                    pdf: pdf,
+                    type: 'jlt',
+                    set: data.set_name,
+                    student: data.stud_name,
+                    date: date,
+                    time: time,
+                });
                 
                 doc.save(data.set_name + ' - ' + data.stud_name + ' Result.pdf');
 
