@@ -16,6 +16,7 @@ use App\NCChoiceSet;
 use App\NCQuestion;
 use App\SetType;
 use PDF;
+use File;
 
 class GuestController extends Controller
 {
@@ -183,6 +184,19 @@ class GuestController extends Controller
             'stud_sensei' =>$request['exam']['stud_sensei'],
             'scores' => $scores
         ];
+    }
+
+    public function downloadResult(Request $request){
+        if($request->pdf){
+            $pdf = base64_decode($request->pdf);
+            $filename = time().' '.$request->set.' - '.$request->student.' Result.pdf';
+            $path = public_path().'\results\\'.$request->type.'\\'.$request->date.'\\';
+
+            if(!file_exists($path)){
+                File::makeDirectory($path);
+            }
+            file_put_contents($path.$filename, $pdf);
+        }
     }
     
     public function getSetAll(Request $request){
